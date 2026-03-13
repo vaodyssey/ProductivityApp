@@ -1,5 +1,5 @@
 import { COLOR_PRIMARY, COLOR_RED, COLOR_WHITE } from "@/constants/colors";
-import { SCREEN_WIDTH } from "@/constants/dimensions";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
@@ -9,17 +9,24 @@ export enum ButtonVariants {
   DANGER,
 }
 
+export enum ButtonSizes {
+  SMALL,
+  MEDIUM,
+  LARGE,
+}
+
 interface ButtonProps {
   label: string;
   variant?: ButtonVariants;
+
   isLoading?: boolean;
-  onClick?: () => void;
+  onPress?: () => void;
 }
 
 const styles = StyleSheet.create({
   button: {
-    width: "50%",
-    height: "8%",
+    width: "100%",
+    height: "100%",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: SCREEN_WIDTH * 0.1,
@@ -38,6 +45,10 @@ const styles = StyleSheet.create({
   },
   dangerButton: {
     backgroundColor: COLOR_RED,
+  },
+  buttonSizeSm: {
+    width: SCREEN_WIDTH * 0.25,
+    height: SCREEN_HEIGHT * 0.05,
   },
   spinner: {
     fontSize: 14,
@@ -61,7 +72,7 @@ const styles = StyleSheet.create({
 const Spinner = () => <Text style={styles.spinner}>...</Text>;
 
 export default function Button(props: ButtonProps) {
-  const { label, variant = ButtonVariants.PRIMARY, isLoading, onClick } = props;
+  const { label, variant = ButtonVariants.PRIMARY, isLoading, onPress } = props;
 
   return (
     <TouchableOpacity
@@ -70,14 +81,21 @@ export default function Button(props: ButtonProps) {
         variant === ButtonVariants.PRIMARY
           ? styles.primaryButton
           : styles.dangerButton,
+        styles.buttonSizeSm,
       ]}
-      onPress={onClick}
+      onPress={onPress}
       disabled={isLoading}
     >
       {isLoading ? (
         <Spinner />
       ) : (
-        <Text style={{ ...FONT_STYLES.H3_STYLE, color: COLOR_WHITE }}>
+        <Text
+          style={{
+            ...FONT_STYLES.H3_STYLE,
+            color: COLOR_WHITE,
+            textAlign: "center",
+          }}
+        >
           {label}
         </Text>
       )}
