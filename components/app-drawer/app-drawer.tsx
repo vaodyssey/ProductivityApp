@@ -1,12 +1,14 @@
 import { DRAWER_COLUMNS_COUNT, SCREEN_WIDTH } from "@/constants/dimensions";
+import AppListModule from "@/modules/app-list-module";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Spinner from "../ui/spinner";
 import { BaseProps } from "./types";
 
 interface AppGridItemProps {
@@ -56,6 +58,7 @@ const AppList: React.FC<AppListProps> = ({ apps, onToggleApp }) => {
       marginVertical: 10, // Adds some breathing room between rows
     },
   });
+
   return (
     <View style={styles.gridContainer}>
       {apps.map((app) => (
@@ -76,14 +79,13 @@ interface AppDrawerProps extends BaseProps {
 }
 
 export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
-  const apps: AppItem[] = [
-    { id: "1", name: "App 1", isChecked: false },
-    { id: "2", name: "App 2", isChecked: false },
-    { id: "3", name: "App 2", isChecked: false },
-    { id: "4", name: "App 2", isChecked: false },
-    { id: "5", name: "App 2", isChecked: false },
-    // Add more apps here
-  ];
+  const [apps, setApps] = useState([]);
+  const [isLoadingApps, setIsLoadingApps] = useState(true);
+  const loadApps = async () => {
+    const installedApps = await AppListModule.getInstalledApps();
+    setApps(installedApps);
+    setIsLoadingApps(false);
+  };
   const renderBackdrop = useCallback(
     (props: BottomSheetDefaultBackdropProps) => (
       <BottomSheetBackdrop
@@ -95,6 +97,10 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
     ),
     [],
   );
+  useEffect(() => {
+    if (!AppListModule) return;
+    loadApps();
+  }, [AppListModule]);
 
   return (
     <BottomSheetModal
@@ -105,7 +111,11 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
     >
       <BottomSheetView style={{ flex: 1, padding: 20 }}>
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>Select Apps</Text>
-        <AppList apps={apps} onToggleApp={(id) => {}} />
+        {isLoadingApps ? (
+          <Spinner />
+        ) : (
+          <AppList apps={apps} onToggleApp={(id) => {}} />
+        )}
       </BottomSheetView>
     </BottomSheetModal>
   );
