@@ -1,6 +1,7 @@
-import { COLOR_BLACK_1 } from "@/constants/colors";
-import { DRAWER_COLUMNS_COUNT, SCREEN_WIDTH } from "@/constants/dimensions";
+import { DRAWER_COLUMNS_COUNT } from "@/constants/dimensions";
 import AppListModule from "@/modules/app-list-module";
+import { setSelectedPackageName } from "@/redux/app-list-slice";
+import { AppDispatch } from "@/redux/store";
 import {
   BottomSheetBackdrop,
   BottomSheetModal,
@@ -8,45 +9,17 @@ import {
 } from "@gorhom/bottom-sheet";
 import { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
+import { useDispatch } from "react-redux";
 import Spinner from "../ui/spinner";
-import { BaseProps } from "./types";
-
-interface AppGridItemProps {
-  appName: string;
-  isChecked: boolean;
-  onToggle: () => void;
-}
-
-const AppGridItem: React.FC<AppGridItemProps> = ({
-  appName,
-  isChecked,
-  onToggle,
-}) => {
-  return (
-    <TouchableOpacity onPress={onToggle}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text style={{ color: COLOR_BLACK_1 }}>{appName}</Text>
-        {/* <Checkbox checked={isChecked} onPress={onToggle} /> */}
-      </View>
-    </TouchableOpacity>
-  );
-};
-
-interface AppItem {
-  id: string;
-  appName: string;
-  packageName: string;
-  isChecked: boolean;
-}
+import { AppGridItem } from "./app-grid-item";
+import { AppItem, BaseProps } from "./types";
 
 interface AppListProps {
   apps: AppItem[];
-  onToggleApp: (id: string) => void;
 }
 
-const AppList: React.FC<AppListProps> = ({ apps, onToggleApp }) => {
-  const ITEM_WIDTH = SCREEN_WIDTH / DRAWER_COLUMNS_COUNT;
+const AppList: React.FC<AppListProps> = ({ apps }) => {
   const styles = StyleSheet.create({
     gridContainer: {
       flexDirection: "row",
@@ -60,16 +33,15 @@ const AppList: React.FC<AppListProps> = ({ apps, onToggleApp }) => {
       marginVertical: 10, // Adds some breathing room between rows
     },
   });
+  const dispatch = useDispatch<AppDispatch>();
+  const onToggle = (packageName: string) =>
+    dispatch(setSelectedPackageName(packageName));
 
   return (
     <View style={styles.gridContainer}>
       {apps.map((app) => (
         <View key={app.id} style={styles.itemWrapper}>
-          <AppGridItem
-            appName={app.appName}
-            isChecked={app.isChecked}
-            onToggle={() => onToggleApp(app.id)}
-          />
+          <AppGridItem appItem={app} onToggle={onToggle} />
         </View>
       ))}
     </View>
@@ -100,6 +72,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
     ),
     [],
   );
+
   useEffect(() => {
     if (!AppListModule) return;
     loadApps();
@@ -114,11 +87,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
     >
       <BottomSheetView style={{ flex: 1, padding: 20 }}>
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>Select Apps</Text>
-        {isLoadingApps ? (
-          <Spinner />
-        ) : (
-          <AppList apps={apps} onToggleApp={(id) => {}} />
-        )}
+        {isLoadingApps ? <Spinner /> : <AppList apps={apps} />}
       </BottomSheetView>
     </BottomSheetModal>
   );

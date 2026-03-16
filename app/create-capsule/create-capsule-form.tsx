@@ -2,8 +2,9 @@ import { AppDrawer } from "@/components/app-drawer/app-drawer";
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
+import { selectSelectedPackageName } from "@/redux/app-list-slice";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -11,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useSelector } from "react-redux";
 
 interface CreateCapsuleFormProps {
   habitName: string;
@@ -33,10 +35,10 @@ const CreateCapsuleForm: React.FC = (
 ) => {
   // const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const ref = useRef<BottomSheetModal>(null);
-  // const { isDrawerOpen, setIsDrawerOpen } = useAppDrawerState({ ref });
   const [mediaPreview, setMediaPreview] = useState<string | null>(null);
   const [mediaFile, setMediaFile] = useState<any>(null);
   const [isEditMode, setIsEditMode] = useState<any>(false);
+  const selectedPackageName = useSelector(selectSelectedPackageName);
 
   const handleCreate = () => {
     // Logic to create or save changes
@@ -46,6 +48,10 @@ const CreateCapsuleForm: React.FC = (
     setMediaPreview(null);
     setMediaFile(null);
   };
+
+  useEffect(() => {
+    console.log("Selected package changed:", selectedPackageName);
+  }, [selectedPackageName]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -64,6 +70,9 @@ const CreateCapsuleForm: React.FC = (
         {/* Application Selection */}
         <View style={styles.inputSection}>
           <Text style={styles.label}>Application You Want to Ditch *</Text>
+          {selectedPackageName && (
+            <Text style={styles.label}>{selectedPackageName}</Text>
+          )}
           <Button
             label={"Select an application"}
             onPress={() => {
