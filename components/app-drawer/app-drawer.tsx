@@ -1,3 +1,4 @@
+import { COLOR_BLACK_1 } from "@/constants/colors";
 import { DRAWER_COLUMNS_COUNT, SCREEN_WIDTH } from "@/constants/dimensions";
 import AppListModule from "@/modules/app-list-module";
 import {
@@ -25,7 +26,7 @@ const AppGridItem: React.FC<AppGridItemProps> = ({
   return (
     <TouchableOpacity onPress={onToggle}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Text>{appName}</Text>
+        <Text style={{ color: COLOR_BLACK_1 }}>{appName}</Text>
         {/* <Checkbox checked={isChecked} onPress={onToggle} /> */}
       </View>
     </TouchableOpacity>
@@ -34,7 +35,8 @@ const AppGridItem: React.FC<AppGridItemProps> = ({
 
 interface AppItem {
   id: string;
-  name: string;
+  appName: string;
+  packageName: string;
   isChecked: boolean;
 }
 
@@ -64,7 +66,7 @@ const AppList: React.FC<AppListProps> = ({ apps, onToggleApp }) => {
       {apps.map((app) => (
         <View key={app.id} style={styles.itemWrapper}>
           <AppGridItem
-            appName={app.name}
+            appName={app.appName}
             isChecked={app.isChecked}
             onToggle={() => onToggleApp(app.id)}
           />
@@ -83,6 +85,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
   const [isLoadingApps, setIsLoadingApps] = useState(true);
   const loadApps = async () => {
     const installedApps = await AppListModule.getInstalledApps();
+    console.log(installedApps);
     setApps(installedApps);
     setIsLoadingApps(false);
   };
