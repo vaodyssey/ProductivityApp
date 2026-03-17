@@ -3,15 +3,15 @@ import AppListModule from "@/modules/app-list-module";
 import { setSelectedPackageName } from "@/redux/app-list-slice";
 import { AppDispatch } from "@/redux/store";
 import {
-  BottomSheetBackdrop,
-  BottomSheetModal,
-  BottomSheetView,
+    BottomSheetBackdrop,
+    BottomSheetModal,
+    BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
 import React, { useCallback, useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { useDispatch } from "react-redux";
-import Spinner from "../ui/spinner";
+import Spinner from "../../../components/ui/spinner";
 import { AppGridItem } from "./app-grid-item";
 import { AppItem, BaseProps } from "./types";
 
