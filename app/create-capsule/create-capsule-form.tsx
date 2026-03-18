@@ -4,6 +4,10 @@ import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import { selectSelectedPackageName } from "@/redux/app-list-slice";
+import {
+  createCapsule,
+  initDatabase,
+} from "@/utils/expo/sqlite/capsules-repository";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -11,12 +15,23 @@ import { useSelector } from "react-redux";
 
 const CreateCapsuleForm: React.FC = () => {
   const ref = useRef<BottomSheetModal>(null);
-  const [badHabitName, setBadHabitName] = useState<string>();
+  const [badHabitName, setBadHabitName] = useState<string | null>();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<any>(false);
   const selectedPackageName = useSelector(selectSelectedPackageName);
 
-  const handleCreate = () => {};
+  const handleCreate = async () => {
+    const db = await initDatabase();
+    if (!badHabitName || !imageUrl || !selectedPackageName) return;
+    await createCapsule(
+      {
+        badHabitName,
+        imageUrl,
+        appPackageName: selectedPackageName,
+      },
+      db,
+    );
+  };
 
   useEffect(() => {
     console.log("Selected package changed:", selectedPackageName);
@@ -28,7 +43,7 @@ const CreateCapsuleForm: React.FC = () => {
         <View style={styles.inputSection}>
           <Text style={styles.label}>Bad Habit Name *</Text>
           <TextInput
-            value={badHabitName}
+            value={badHabitName ?? ""}
             onChangeText={(text) => {
               setBadHabitName(text);
             }}

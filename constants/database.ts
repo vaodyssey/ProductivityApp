@@ -1,3 +1,3 @@
-const DATABASE_NAME = "productivity-app-db";
+export const DATABASE_NAME = "productivity-app-db";
 
-const CAPSULE_TABLE_NAME = "capsules";
+export const CAPSULE_TABLE_NAME = "capsules";

@@ -1,15 +1,52 @@
 import Button, { ButtonVariants } from "@/components/ui/button";
+import Spinner from "@/components/ui/spinner";
+import { COLOR_PRIMARY } from "@/constants/colors";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
-import { useRouter } from "expo-router";
-import React from "react";
+import { Capsule } from "@/models/Capsule";
+import { readAllCapsules } from "@/utils/expo/sqlite/capsules-repository";
+import { usePathname, useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 const IndexScreen = () => {
-  const router = useRouter();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [capsules, setCapsules] = useState<Capsule[]>([]);
+  const pathname = usePathname();
 
+  const loadAllCapsules = async () => {
+    const capsules = await readAllCapsules();
+    setCapsules([...capsules]);
+    setLoading(false);
+  };
+  useEffect(() => {
+    if (pathname != "/") return;
+    loadAllCapsules();
+  }, [pathname]);
   return (
     <View style={styles.container}>
+      {loading && <Spinner />}
+      {capsules.length === 0 ? (
+        <NoCapsuleSection />
+      ) : (
+        <>
+          {capsules.map((capsule) => {
+            return (
+              <Text style={{ color: COLOR_PRIMARY }}>
+                {capsule.appPackageName}
+              </Text>
+            );
+          })}
+        </>
+      )}
+    </View>
+  );
+};
+
+const NoCapsuleSection = () => {
+  const router = useRouter();
+  return (
+    <>
       <Text style={{ ...FONT_STYLES.BODY_STYLE, textAlign: "center" }}>
         You don't have any Capsule of Shame for now. Click Create to get
         started!
@@ -22,10 +59,9 @@ const IndexScreen = () => {
           router.navigate("/create-capsule"); // Navigate back to the home screen
         }}
       />
-    </View>
+    </>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
