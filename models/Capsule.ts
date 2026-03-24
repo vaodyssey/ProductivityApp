@@ -1,5 +1,5 @@
 export interface Capsule {
-  id?: string;
+  id?: number;
   badHabitName: string;
   appPackageName: string;
   imageUrl: string;

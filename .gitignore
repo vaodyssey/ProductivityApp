@@ -45,3 +45,4 @@ app-example
 #Expo native modules
 **/build
 .idea
+*.gradle
