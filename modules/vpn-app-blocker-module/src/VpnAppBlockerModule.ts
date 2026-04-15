@@ -8,6 +8,8 @@ import {
 declare class VpnAppBlockerModule extends NativeModule<VpnAppBlockerModuleEvents> {
   checkVpnPermission(): Promise<VpnPermissionResult>;
   requestVpnPermission(): Promise<boolean>;
+  startVpn(blacklistedPackages: string[]): Promise<boolean>;
+  stopVpn(): Promise<boolean>;
 }
 
 export default requireNativeModule<VpnAppBlockerModule>("VpnAppBlockerModule");

@@ -22,14 +22,18 @@ const IndexScreen = () => {
     setCapsules([...capsules]);
     setLoading(false);
   };
-  const blockApps = async (): Promise<boolean> => {
-    const hasPermission = await VpnAppBlockerModule.checkVpnPermission();
-    if (!hasPermission) {
-      // throw new Error(
-      //   "VPN permission has not been granted. " +
-      //     "You must call VpnService.prepare() from a native Activity and let the user accept the system dialog first.",
-      // );
-    }
+  const revokeVpnPermission = async () => {
+    const vpnIsStopped = await VpnAppBlockerModule.stopVpn();
+    if (!vpnIsStopped) return;
+    const tappedButton = await showAlertDialog({
+      title: "VPN Connection Stopped",
+      message:
+        "You have successfully revoked VPN permission for this application.",
+      buttons: [{ text: "Okay" }],
+    });
+  };
+
+  const askUserPermission = async () => {
     const tappedButton = await showAlertDialog({
       title: "VPN Permission Required",
       message:
@@ -39,15 +43,31 @@ const IndexScreen = () => {
     });
 
     if (tappedButton !== "Allow") return false;
+    return true;
+  };
 
-    return VpnAppBlockerModule.requestVpnPermission();
-    // await AppBlockerVpnModule.startVpn(packages);
+  const blockApps = async (): Promise<void> => {
+    const vpnIntent = await VpnAppBlockerModule.checkVpnPermission();
+    let userAgree = false;
+    if (vpnIntent) userAgree = await askUserPermission();
+    else userAgree = true;
+    if (!userAgree) return;
+    VpnAppBlockerModule.requestVpnPermission();
+    const blockedPackages = capsules.map((capsules) => {
+      return capsules.appPackageName;
+    });
+    const startVpnResult = await VpnAppBlockerModule.startVpn(blockedPackages);
+    // console.log(startVpnResult);
   };
   useEffect(() => {
     if (pathname != "/") return;
-    blockApps();
-    // loadAllCapsules();
+    loadAllCapsules();
   }, [pathname]);
+
+  useEffect(() => {
+    if (capsules.length === 0) return;
+    blockApps();
+  }, [capsules]);
   return (
     <View style={styles.container}>
       {loading && <Spinner />}
@@ -72,6 +92,16 @@ const IndexScreen = () => {
         onPress={() => {
           router.navigate("/create-capsule"); // Navigate back to the home screen
         }}
+      />
+      <Button
+        label="Block apps"
+        variant={ButtonVariants.PRIMARY}
+        onPress={blockApps}
+      />
+      <Button
+        label="Revoke VPN permission"
+        variant={ButtonVariants.PRIMARY}
+        onPress={revokeVpnPermission}
       />
     </View>
   );
