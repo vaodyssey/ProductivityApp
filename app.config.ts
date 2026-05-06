@@ -14,7 +14,10 @@ module.exports = () => ({
       supportsTablet: true,
     },
     android: {
-      permissions: ["android.permission.BIND_VPN_SERVICE"],
+      permissions: [
+        "android.permission.BIND_VPN_SERVICE",
+        "android.permission.POST_NOTIFICATIONS",
+      ],
       adaptiveIcon: {
         backgroundColor: "#E6F4FE",
         foregroundImage: "./assets/images/android-icon-foreground.png",
