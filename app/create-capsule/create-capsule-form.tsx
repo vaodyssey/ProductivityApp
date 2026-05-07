@@ -8,13 +8,13 @@ import {
   createCapsule,
   initDatabase,
 } from "@/utils/expo/sqlite/capsules-repository";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import BottomSheet from "@gorhom/bottom-sheet";
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSelector } from "react-redux";
 
 const CreateCapsuleForm: React.FC = () => {
-  const ref = useRef<BottomSheetModal>(null);
+  const ref = useRef<BottomSheet>(null);
   const [badHabitName, setBadHabitName] = useState<string | null>();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isEditMode, setIsEditMode] = useState<any>(false);
@@ -60,7 +60,7 @@ const CreateCapsuleForm: React.FC = () => {
           <Button
             label={"Select an application"}
             onPress={() => {
-              ref.current?.present();
+              ref.current?.expand();
             }}
           />
         </View>

@@ -1,17 +1,16 @@
+import Spinner from "@/components/ui/spinner";
 import { DRAWER_COLUMNS_COUNT } from "@/constants/dimensions";
 import AppListModule from "@/modules/app-list-module";
 import { setSelectedPackageName } from "@/redux/app-list-slice";
 import { AppDispatch } from "@/redux/store";
-import {
-    BottomSheetBackdrop,
-    BottomSheetModal,
-    BottomSheetView,
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
 import React, { useCallback, useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { ListRenderItemInfo, StyleSheet, Text } from "react-native";
 import { useDispatch } from "react-redux";
-import Spinner from "../../../components/ui/spinner";
 import { AppGridItem } from "./app-grid-item";
 import { AppItem, BaseProps } from "./types";
 
@@ -38,13 +37,12 @@ const AppList: React.FC<AppListProps> = ({ apps }) => {
     dispatch(setSelectedPackageName(packageName));
 
   return (
-    <View style={styles.gridContainer}>
-      {apps.map((app) => (
-        <View key={app.id} style={styles.itemWrapper}>
-          <AppGridItem appItem={app} onToggle={onToggle} />
-        </View>
-      ))}
-    </View>
+    <BottomSheetFlatList
+      data={apps}
+      renderItem={(appItem: ListRenderItemInfo<AppItem>) => (
+        <AppGridItem appItem={appItem.item} onToggle={onToggle} />
+      )}
+    />
   );
 };
 
@@ -53,12 +51,15 @@ interface AppDrawerProps extends BaseProps {
 }
 
 export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
-  const [apps, setApps] = useState([]);
+  const [apps, setApps] = useState<AppItem[]>([]);
   const [isLoadingApps, setIsLoadingApps] = useState(true);
   const loadApps = async () => {
     const installedApps = await AppListModule.getInstalledApps();
     console.log(installedApps);
-    setApps(installedApps);
+    const testApps = installedApps.filter(
+      (app) => app.packageName === "com.facebook.katana",
+    );
+    setApps(testApps);
     setIsLoadingApps(false);
   };
   const renderBackdrop = useCallback(
@@ -79,16 +80,15 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
   }, [AppListModule]);
 
   return (
-    <BottomSheetModal
+    <BottomSheet
       ref={ref}
       backdropComponent={renderBackdrop}
       index={0}
       snapPoints={["50%"]}
+      enablePanDownToClose={true}
     >
-      <BottomSheetView style={{ flex: 1, padding: 20 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold" }}>Select Apps</Text>
-        {isLoadingApps ? <Spinner /> : <AppList apps={apps} />}
-      </BottomSheetView>
-    </BottomSheetModal>
+      <Text style={{ fontSize: 18, fontWeight: "bold" }}>Select Apps</Text>
+      {isLoadingApps ? <Spinner /> : <AppList apps={apps} />}
+    </BottomSheet>
   );
 };

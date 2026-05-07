@@ -63,11 +63,6 @@ const IndexScreen = () => {
     if (pathname != "/") return;
     loadAllCapsules();
   }, [pathname]);
-
-  useEffect(() => {
-    if (capsules.length === 0) return;
-    blockApps();
-  }, [capsules]);
   return (
     <View style={styles.container}>
       {loading && <Spinner />}

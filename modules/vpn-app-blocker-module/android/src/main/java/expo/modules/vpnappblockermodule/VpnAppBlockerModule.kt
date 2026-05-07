@@ -14,14 +14,26 @@ class VpnAppBlockerModule : Module() {
   override fun definition() = ModuleDefinition {
     var vpnPermissionPromise: Promise? = null
     val REQUEST_CODE_VPN_PERMISSION = 0x0F00
-    val serviceConnection = VpnAppBlockerServiceConnection(appContext)
-    val ACTION_STOP = "expo.modules.vpnappblockermodule.STOP"
+
     Name("VpnAppBlockerModule")
+    // ---------------------------------------------------------------
+    // OnCreate fires when the module is first initialized (app start)
+    // ---------------------------------------------------------------
+    OnCreate {
+      val context = appContext.reactContext ?: return@OnCreate
+      // Start VpnAppBlockerService, and binds NotificationService with VpnAppBlockerService, making both
+      // ready for user to activate at any time (e.g. press Block button calls startVpn())
+      // bindService(NotificationService), NotificationService is already running
+      val vpnIntent = Intent(context, VpnAppBlockerService::class.java)
+      context.startService(vpnIntent)
+    }
+
     AsyncFunction("checkVpnPermission") { promise: Promise ->
       val context: Context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
       val intent = VpnService.prepare(context)
       promise.resolve(intent?.action)
     }
+
     AsyncFunction("requestVpnPermission") { promise: Promise ->
       val context: Context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
 
@@ -71,7 +83,8 @@ class VpnAppBlockerModule : Module() {
         }
 
       val serviceIntent = Intent(context, VpnAppBlockerService::class.java)
-      context.startService(serviceIntent)
+      serviceIntent.putExtra("action", "START_VPN")
+        context.startService(serviceIntent)
         promise.resolve(true)
       } catch (e: Exception) {
         promise.resolve(false)
