@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["AppListModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.applistmodule.AppListModule"]
+  }
+}

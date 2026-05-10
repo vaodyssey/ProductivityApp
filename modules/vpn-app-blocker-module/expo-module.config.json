@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android", "web"],
+  "apple": {
+    "modules": ["VpnAppBlockerModule"]
+  },
+  "android": {
+    "modules": ["expo.modules.vpnappblockermodule.VpnAppBlockerModule"]
+  }
+}
