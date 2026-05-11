@@ -1,8 +1,10 @@
 import { COLOR_PRIMARY } from "@/constants/colors";
 import { SCREEN_WIDTH } from "@/constants/dimensions";
+import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/Capsule";
 import { deleteCapsule } from "@/utils/expo/sqlite/capsules-repository";
 import { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -15,6 +17,7 @@ export const CardItem: React.FC<CardItemProps> = ({
   capsule,
   onPressDelete,
 }) => {
+  const router = useRouter();
   const handleDelete = async (id: number | undefined) => {
     try {
       if (!id) return;
@@ -30,14 +33,19 @@ export const CardItem: React.FC<CardItemProps> = ({
     }
   };
 
+  const updateCapsule = (id: number | undefined) => {
+    router.navigate({ pathname: "/create-capsule", params: { id } });
+  };
+
   return (
-    <View style={styles.container}>
-      {/* Top: Bad Habit Name (Larger & Bold) */}
+    <View
+      style={styles.container}
+      onTouchStart={() => updateCapsule(capsule.id)}
+    >
       <View>
-        <Text style={styles.badHabitName}>
+        <Text style={[styles.badHabitName, FONT_STYLES.H3_STYLE]}>
           {capsule.badHabitName || "No Habit Name"}
         </Text>
-        {/* Left Side: Package Name */}
         <Text
           style={styles.packageName}
           numberOfLines={1} // Prevents text from breaking layout
@@ -73,8 +81,6 @@ const styles = StyleSheet.create({
   },
   packageName: {
     color: COLOR_PRIMARY,
-    fontSize: 16,
-    fontWeight: "500",
     flex: 1, // Allows text to take available space before hitting the button
   },
   deleteButton: {
@@ -89,7 +95,5 @@ const styles = StyleSheet.create({
   },
   badHabitName: {
     color: COLOR_PRIMARY,
-    fontSize: 22, // Larger size
-    fontWeight: "700", // Bold weight
   },
 });

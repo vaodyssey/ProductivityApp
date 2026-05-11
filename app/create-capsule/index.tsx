@@ -1,12 +1,21 @@
+import { Capsule } from "@/models/Capsule";
+import { useLocalSearchParams } from "expo-router";
 import React from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import CreateCapsuleForm from "./create-capsule-form";
+import { useCapsule } from "./hooks/useCapsule";
 
 const CreateCapsuleScreen: React.FC = () => {
+  const { id } = useLocalSearchParams<{ id?: string }>();
+  const methods = useForm<Capsule>();
+  useCapsule(id);
   return (
-    <View style={styles.container}>
-      <CreateCapsuleForm />
-    </View>
+    <FormProvider {...methods}>
+      <View style={styles.container}>
+        <CreateCapsuleForm />
+      </View>
+    </FormProvider>
   );
 };
 

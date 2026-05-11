@@ -30,15 +30,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: SCREEN_WIDTH * 0.1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    fontSize: 14,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
   },
   primaryButton: {
     backgroundColor: COLOR_PRIMARY,
@@ -91,7 +82,7 @@ export default function Button(props: ButtonProps) {
       ) : (
         <Text
           style={{
-            ...FONT_STYLES.H3_STYLE,
+            ...FONT_STYLES.LABEL_STYLE,
             color: COLOR_WHITE,
             textAlign: "center",
           }}
