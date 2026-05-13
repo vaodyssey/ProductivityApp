@@ -1,10 +1,14 @@
+import { Capsule } from "@/models/Capsule";
 import { readCapsuleById } from "@/utils/expo/sqlite/capsules-repository";
 import { parseNumberFromString } from "@/utils/number";
 import { useEffect } from "react";
-import { useFormContext } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 
-export const useCapsule = (id?: string) => {
-  const methods = useFormContext();
+interface UseCapsuleProps {
+  methods: UseFormReturn<Capsule, any, Capsule>;
+  id?: string;
+}
+export const useCapsule = ({ methods, id }: UseCapsuleProps) => {
   const equipHookFormWithExistingCapsule = async () => {
     const idNumber = parseNumberFromString(id);
     if (!idNumber) return;

@@ -26,7 +26,7 @@ interface ButtonProps {
 const styles = StyleSheet.create({
   button: {
     width: "100%",
-    height: "100%",
+    height: SCREEN_HEIGHT * 0.06,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: SCREEN_WIDTH * 0.1,
@@ -36,10 +36,6 @@ const styles = StyleSheet.create({
   },
   dangerButton: {
     backgroundColor: COLOR_RED,
-  },
-  buttonSizeSm: {
-    width: SCREEN_WIDTH * 0.25,
-    height: SCREEN_HEIGHT * 0.05,
   },
   spinner: {
     fontSize: 14,
@@ -72,7 +68,6 @@ export default function Button(props: ButtonProps) {
         variant === ButtonVariants.PRIMARY
           ? styles.primaryButton
           : styles.dangerButton,
-        styles.buttonSizeSm,
       ]}
       onPress={onPress}
       disabled={isLoading}

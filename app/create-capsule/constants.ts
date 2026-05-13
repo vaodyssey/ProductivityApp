@@ -6,3 +6,8 @@ export const DEFAULT_CAPSULE: Capsule = {
   appPackageName: "",
   imageUrl: "",
 };
+
+export enum CapsuleFormMode {
+  EDIT,
+  CREATE,
+}

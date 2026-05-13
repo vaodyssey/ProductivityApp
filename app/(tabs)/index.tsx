@@ -43,6 +43,7 @@ const IndexScreen = () => {
     const blockedPackages = capsules.map((capsules) => {
       return capsules.appPackageName;
     });
+    VpnAppBlockerModule.startVpn(blockedPackages);
   };
 
   return (
