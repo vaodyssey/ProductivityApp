@@ -11,3 +11,5 @@ export enum CapsuleFormMode {
   EDIT,
   CREATE,
 }
+
+export const BOTTOM_SHEET_SNAP_POINTS = ["80%"];

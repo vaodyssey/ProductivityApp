@@ -1,3 +1,4 @@
+import { useChangeScreenTitle } from "@/hooks/useChangeScreenTitle";
 import { Capsule } from "@/models/Capsule";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
@@ -11,7 +12,13 @@ const CreateCapsuleScreen: React.FC = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const methods = useForm<Capsule>({ defaultValues: DEFAULT_CAPSULE });
   const mode = id ? CapsuleFormMode.EDIT : CapsuleFormMode.CREATE;
+  const shouldChangeScreenTitle = !!id;
+
   useCapsule({ methods, id });
+  useChangeScreenTitle({
+    newTitle: "Update Capsule",
+    shouldApply: shouldChangeScreenTitle,
+  });
 
   return (
     <FormProvider {...methods}>

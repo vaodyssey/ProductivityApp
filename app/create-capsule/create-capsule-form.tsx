@@ -5,7 +5,6 @@ import TextInput from "@/components/ui/text-input";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/Capsule";
-import { selectSelectedPackageName } from "@/redux/app-list-slice";
 import {
   createCapsule,
   initDatabase,
@@ -14,7 +13,6 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import React, { useRef } from "react";
 import { FieldErrors, useFormContext } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
-import { useSelector } from "react-redux";
 import { CapsuleFormMode } from "./constants";
 
 interface CapsuleFormProps {
@@ -22,13 +20,8 @@ interface CapsuleFormProps {
 }
 const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
   const ref = useRef<BottomSheet>(null);
-  // const [badHabitName, setBadHabitName] = useState<string | null>();
-
-  const selectedPackageName = useSelector(selectSelectedPackageName);
-  const methods = useFormContext();
-  const { register, setValue, getValues, handleSubmit, watch, control } =
-    useFormContext<Capsule>();
-
+  const { getValues, handleSubmit, watch } = useFormContext<Capsule>();
+  const defaultImage = watch("imageUrl");
   const onSubmit = async () => {
     const db = await initDatabase();
     const capsule = getValues();
@@ -36,19 +29,13 @@ const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
   };
   const onSubmitError = (errors: FieldErrors<Capsule>) => console.log(errors);
 
-  // useEffect(() => {
-  //   const values = watch();
-  //   if (Object.keys(values).length > 0)
-  //     console.log(`za values ${Object.keys(values)}`);
-  // }, [watch()]);
-
   return (
     <View style={styles.content}>
       <View style={styles.formGroup}>
         <View style={styles.formItem}>
           <Text style={FONT_STYLES.H5_STYLE}>Bad Habit Name *</Text>
           <TextInput
-            // placeholder="e.g., Ditch Social Media"
+            placeholder="e.g. Ditch Social Media"
             name={"badHabitName"}
           />
         </View>
@@ -62,14 +49,15 @@ const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
               ref.current?.expand();
             }}
             editable={false}
-            // placeholder="e.g., Ditch Social Media"
+            placeholder="e.g. Facebook"
             name={"appPackageName"}
           />
         </View>
         <View style={styles.formItem}>
           <Text style={FONT_STYLES.H5_STYLE}>Select your worst image *</Text>
           <ImagePickerWrapper
-            setImage={(image) => setValue("imageUrl", image)}
+            // setImage={(image) => setValue("imageUrl", image)}
+            imageHookFormPath={"imageUrl"}
           />
         </View>
       </View>

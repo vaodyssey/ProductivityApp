@@ -38,16 +38,13 @@ export const CardItem: React.FC<CardItemProps> = ({
   };
 
   return (
-    <View
-      style={styles.container}
-      onTouchStart={() => updateCapsule(capsule.id)}
-    >
-      <View>
-        <Text style={[styles.badHabitName, FONT_STYLES.H3_STYLE]}>
+    <View style={styles.container}>
+      <View onTouchStart={() => updateCapsule(capsule.id)}>
+        <Text style={[styles.badHabitName, FONT_STYLES.H4_STYLE]}>
           {capsule.badHabitName || "No Habit Name"}
         </Text>
         <Text
-          style={styles.packageName}
+          style={[styles.packageName, FONT_STYLES.CAPTION_STYLE]}
           numberOfLines={1} // Prevents text from breaking layout
           ellipsizeMode="tail" // Adds "..." if too long
         >

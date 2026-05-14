@@ -1,5 +1,6 @@
 // import React from "react";
 import FONT_STYLES from "@/constants/text";
+import { JSX } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import {
   Platform,
@@ -15,11 +16,14 @@ interface TextInputExtendedProps extends TextInputProps {
   error?: string;
   onTextInputPress?: () => void;
   name?: string;
+  leadingIcon?: JSX.Element;
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "column",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
     gap: 8,
   },
   labelSection: {
@@ -63,25 +67,29 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function TextInput({ label, ...props }: TextInputExtendedProps) {
+export default function TextInput({
+  label,
+  leadingIcon,
+  ...props
+}: TextInputExtendedProps) {
   const { control } = useFormContext();
   return (
     <Controller
       control={control}
-      rules={{ required: true }}
       name={props.name ?? ""}
       render={({ field: { onChange, onBlur, value } }) => (
         <TouchableOpacity
           style={styles.container}
           onPress={props.onTextInputPress && props.onTextInputPress}
         >
+          {leadingIcon && leadingIcon}
           {label && (
             <Text style={[styles.label, FONT_STYLES.LABEL_STYLE]}>{label}</Text>
           )}
           <RNTextInput
             style={[styles.input, props.style]}
             editable={!props.editable}
-            value={value || "hehehehe"}
+            value={value}
             onBlur={onBlur}
             onChangeText={onChange}
             {...props}

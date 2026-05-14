@@ -41,8 +41,8 @@ export default function RootLayout() {
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
-                  name="modal"
-                  options={{ presentation: "modal", title: "Modal" }}
+                  name="create-capsule/index"
+                  options={{ title: "Create Capsule" }}
                 />
               </Stack>
               <StatusBar style="auto" />

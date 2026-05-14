@@ -23,7 +23,7 @@ const CapsulesScreen = () => {
   };
 
   useEffect(() => {
-    if (pathname != "/") return;
+    if (pathname != "/capsules") return;
     loadAllCapsules();
   }, [pathname]);
   return (
