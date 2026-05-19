@@ -8,9 +8,11 @@ import { Capsule } from "@/models/Capsule";
 import {
   createCapsule,
   initDatabase,
+  updateCapsule,
 } from "@/utils/expo/sqlite/capsules-repository";
 import BottomSheet from "@gorhom/bottom-sheet";
-import React, { useRef } from "react";
+import { useRouter } from "expo-router";
+import React, { useRef, useState } from "react";
 import { FieldErrors, useFormContext } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
 import { CapsuleFormMode } from "./constants";
@@ -20,12 +22,22 @@ interface CapsuleFormProps {
 }
 const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
   const ref = useRef<BottomSheet>(null);
-  const { getValues, handleSubmit, watch } = useFormContext<Capsule>();
-  const defaultImage = watch("imageUrl");
+  const { getValues, handleSubmit } = useFormContext<Capsule>();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
   const onSubmit = async () => {
-    const db = await initDatabase();
-    const capsule = getValues();
-    await createCapsule(capsule, db);
+    try {
+      setIsSubmitting(true);
+      const db = await initDatabase();
+      const capsule = getValues();
+      if (capsule.id) await updateCapsule(capsule);
+      else await createCapsule(capsule, db);
+      router.navigate("/(tabs)/capsules");
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   const onSubmitError = (errors: FieldErrors<Capsule>) => console.log(errors);
 
@@ -67,6 +79,7 @@ const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
             mode === CapsuleFormMode.EDIT ? "Save Changes" : "Create Capsule"
           }
           onPress={handleSubmit(onSubmit, onSubmitError)}
+          isLoading={isSubmitting}
         />
       </View>
       <AppDrawer ref={ref} />

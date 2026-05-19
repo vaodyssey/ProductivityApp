@@ -36,7 +36,7 @@ export const AppSearchBar: React.FC<AppSearchBarProps> = ({
     );
 
     onSearchResults(filtered);
-  }, [debouncedQuery, apps]);
+  }, [debouncedQuery]);
 
   return (
     <View style={styles.container}>

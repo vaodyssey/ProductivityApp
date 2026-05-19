@@ -117,3 +117,19 @@ async function ensureOpenDatabase(): Promise<SQLite.SQLiteDatabase> {
   }
   return dbInstance;
 }
+
+export async function updateCapsule(
+  capsule: Capsule,
+  db?: SQLite.SQLiteDatabase,
+): Promise<number> {
+  const targetDb = db || (await ensureOpenDatabase());
+  if (!capsule.id) return 0;
+  const result = await targetDb.runAsync(
+    "UPDATE capsules SET badHabitName = ?, appPackageName = ?, imageUrl = ? WHERE id = ?",
+    capsule.badHabitName,
+    capsule.appPackageName,
+    capsule.imageUrl,
+    capsule.id,
+  );
+  return result.changes;
+}

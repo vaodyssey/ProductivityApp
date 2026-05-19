@@ -9,6 +9,7 @@ import BottomSheet, {
   SCREEN_HEIGHT,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
+import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ListRenderItemInfo, StyleSheet, Text } from "react-native";
@@ -19,12 +20,15 @@ import { AppItem, BaseProps } from "./types";
 
 interface AppListProps {
   apps: AppItem[];
+  ref: React.RefObject<BottomSheetMethods | null>;
 }
 
-const AppList: React.FC<AppListProps> = ({ apps }) => {
+const AppList: React.FC<AppListProps> = ({ apps, ref }) => {
   const methods = useFormContext<Capsule>();
-  const onToggle = (packageName: string) =>
+  const onToggle = (packageName: string) => {
     methods.setValue("appPackageName", packageName);
+    ref?.current?.close();
+  };
 
   return (
     <BottomSheetFlatList
@@ -92,7 +96,7 @@ export const AppDrawer: React.FC<AppDrawerProps> = ({ ref }) => {
         resetSearch={resetSearch}
       />
       <Divider />
-      {isLoadingApps ? <Spinner /> : <AppList apps={apps} />}
+      {isLoadingApps ? <Spinner /> : <AppList apps={apps} ref={ref} />}
     </BottomSheet>
   );
 };

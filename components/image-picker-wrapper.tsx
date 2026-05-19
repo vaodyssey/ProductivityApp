@@ -1,14 +1,11 @@
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { Alert, Image, StyleSheet, View } from "react-native";
 import Button from "./ui/button";
 
 interface ImagePickerWrapperProps {
-  // defaultImage?: string;
   imageHookFormPath: string;
-  // setImage: (image: string) => void;
 }
 
 export default function ImagePickerWrapper({
@@ -16,9 +13,8 @@ export default function ImagePickerWrapper({
   // setImage,
   imageHookFormPath,
 }: ImagePickerWrapperProps) {
-  const [internalImage, setInternalImage] = useState<string | null>(null);
-  const { watch, setValue } = useFormContext();
-  const image: string = watch(imageHookFormPath);
+  const { watch, setValue, control } = useFormContext();
+  const internalImage: string = watch(imageHookFormPath);
   const pickImage = async () => {
     // No permissions request is necessary for launching the image library.
     // Manually request permissions for videos on iOS when `allowsEditing` is set to `false`
@@ -45,10 +41,7 @@ export default function ImagePickerWrapper({
 
     console.log(result);
 
-    if (!result.canceled) {
-      setValue(imageHookFormPath, result.assets[0].uri);
-      setInternalImage(result.assets[0].uri);
-    }
+    if (!result.canceled) setValue(imageHookFormPath, result.assets[0].uri);
   };
   const buttonLabel = internalImage
     ? "Choose another Image"
@@ -56,10 +49,16 @@ export default function ImagePickerWrapper({
 
   // const displayImage = defaultImage ?? internalImage ?? "";
   return (
-    <View style={styles.container}>
-      <Image source={{ uri: image ?? "" }} style={styles.image} />
-      <Button label={buttonLabel} onPress={pickImage} />
-    </View>
+    <Controller
+      control={control}
+      name={imageHookFormPath}
+      render={({ field: { value } }) => (
+        <View style={styles.container}>
+          <Image source={{ uri: value ?? "" }} style={styles.image} />
+          <Button label={buttonLabel} onPress={pickImage} />
+        </View>
+      )}
+    />
   );
 }
 

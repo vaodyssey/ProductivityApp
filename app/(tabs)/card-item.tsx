@@ -1,12 +1,13 @@
-import { COLOR_PRIMARY } from "@/constants/colors";
+import { COLOR_PRIMARY, COLOR_RED } from "@/constants/colors";
 import { SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/Capsule";
 import { deleteCapsule } from "@/utils/expo/sqlite/capsules-repository";
+import { Ionicons } from "@expo/vector-icons";
 import { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface CardItemProps {
   capsule: Capsule;
@@ -18,6 +19,21 @@ export const CardItem: React.FC<CardItemProps> = ({
   onPressDelete,
 }) => {
   const router = useRouter();
+  const handleDeleteConfirmation = (id?: number) => {
+    if (!id) return;
+    Alert.alert(
+      "Delete Capsule",
+      "Are you sure you want to delete this capsule?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => handleDelete(id),
+        },
+      ],
+    );
+  };
   const handleDelete = async (id: number | undefined) => {
     try {
       if (!id) return;
@@ -54,11 +70,14 @@ export const CardItem: React.FC<CardItemProps> = ({
 
       {/* Right Side: Delete Button */}
       <TouchableOpacity
-        onPress={() => handleDelete(capsule.id)}
-        style={styles.deleteButton}
+        onPress={() => handleDeleteConfirmation(capsule.id)}
         activeOpacity={0.7}
       >
-        <Text style={styles.deleteButtonText}>×</Text>
+        <Ionicons
+          name="trash-outline"
+          size={SCREEN_WIDTH * 0.05}
+          color={COLOR_RED}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -69,26 +88,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E0E0E0", // Optional separator line
+    paddingVertical: SCREEN_HEIGHT * 0.01,
+    paddingHorizontal: SCREEN_WIDTH * 0.04,
+    borderWidth: SCREEN_HEIGHT * 0.003,
+    borderColor: COLOR_PRIMARY,
+    borderRadius: SCREEN_WIDTH * 0.05,
     width: SCREEN_WIDTH * 0.8,
     height: SCREEN_HEIGHT * 0.1,
   },
   packageName: {
     color: COLOR_PRIMARY,
     flex: 1, // Allows text to take available space before hitting the button
-  },
-  deleteButton: {
-    padding: 4,
-    paddingRight: 8,
-  },
-  deleteButtonText: {
-    color: "#FF5252", // Red for delete
-    fontSize: 18,
-    fontWeight: "bold",
-    lineHeight: 18, // Matches font size for proper hit area
   },
   badHabitName: {
     color: COLOR_PRIMARY,
