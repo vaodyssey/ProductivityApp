@@ -1,4 +1,4 @@
-package expo.modules.vpnappblockermodule
+package expo.modules.vpnappblockermodule.entities
 
 data class Capsule(
   var id: Int,

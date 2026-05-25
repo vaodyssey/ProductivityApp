@@ -1,6 +1,5 @@
-package expo.modules.vpnappblockermodule
+package expo.modules.vpnappblockermodule.utils
 
-// utils/JsonSerializer.kt
 import org.json.JSONArray
 import org.json.JSONObject
 

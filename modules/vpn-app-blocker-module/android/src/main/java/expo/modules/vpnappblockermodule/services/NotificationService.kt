@@ -1,9 +1,10 @@
-package expo.modules.vpnappblockermodule
+package expo.modules.vpnappblockermodule.services
 
-import android.app.Notification
+import android.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Binder
@@ -13,8 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import java.net.URL
 
-
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.Q)
 
 class NotificationService : Service() {
   private val OVERUSE_NOTIFICATION_CHANNEL_ID = "vpn_overuse_channel"
@@ -56,7 +56,7 @@ class NotificationService : Service() {
         NotificationCompat.BigTextStyle().bigText(
           "$appName is attempting to access the internet.\n\n" + "Stay strong — you set this limit for a reason. 💪"
         )
-      ).setSmallIcon(android.R.drawable.ic_dialog_alert)
+      ).setSmallIcon(R.drawable.ic_dialog_alert)
       .setPriority(NotificationCompat.PRIORITY_HIGH).setAutoCancel(true)
 
       .setAutoCancel(true)

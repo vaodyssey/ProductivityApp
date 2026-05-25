@@ -1,7 +1,6 @@
-package expo.modules.vpnappblockermodule
+package expo.modules.vpnappblockermodule.services
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.os.Binder
@@ -10,6 +9,7 @@ import android.os.IBinder
 import android.os.Process
 import android.util.Log
 import androidx.annotation.RequiresApi
+import expo.modules.vpnappblockermodule.entities.PacketInfo
 import java.net.InetSocketAddress
 
 @RequiresApi(Build.VERSION_CODES.Q)
@@ -28,7 +28,7 @@ class ExtractPkgNameFromBufferService : Service() {
   fun getPackageFromBuffer(buffer: ByteArray, length: Int): String? {
     val packetInfo = parsePacketInfo(buffer, length) ?: return null
 
-    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE)
+    val connectivityManager = getSystemService(CONNECTIVITY_SERVICE)
             as ConnectivityManager
 
     return try {
