@@ -1,4 +1,5 @@
 // VpnAppBlockerModule.ts
+import { Capsule } from "@/models/Capsule";
 import { NativeModule, requireNativeModule } from "expo";
 import {
   VpnAppBlockerModuleEvents,
@@ -8,7 +9,7 @@ import {
 declare class VpnAppBlockerModule extends NativeModule<VpnAppBlockerModuleEvents> {
   checkVpnPermission(): Promise<VpnPermissionResult>;
   requestVpnPermission(): Promise<boolean>;
-  startVpn(blacklistedPackages: string[]): Promise<boolean>;
+  startVpn(capsules: Capsule[]): Promise<boolean>;
   stopVpn(): Promise<boolean>;
 }
 

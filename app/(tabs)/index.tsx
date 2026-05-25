@@ -1,13 +1,13 @@
 import { showAlertDialog } from "@/components/ui/alert-dialog";
 import Button, { ButtonVariants } from "@/components/ui/button";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
-import { Capsule } from "@/models/Capsule";
 import VpnAppBlockerModule from "@/modules/vpn-app-blocker-module/src/VpnAppBlockerModule";
-import React, { useState } from "react";
+import { readAllCapsules } from "@/utils/expo/sqlite/capsules-repository";
+import React from "react";
 import { StyleSheet, View } from "react-native";
 
 const IndexScreen = () => {
-  const [capsules, setCapsules] = useState<Capsule[]>([]);
+  // const [capsules, setCapsules] = useState<Capsule[]>([]);
 
   const revokeVpnPermission = async () => {
     const vpnIsStopped = await VpnAppBlockerModule.stopVpn();
@@ -39,11 +39,10 @@ const IndexScreen = () => {
     if (vpnIntent) userAgree = await askUserPermission();
     else userAgree = true;
     if (!userAgree) return;
-    VpnAppBlockerModule.requestVpnPermission();
-    const blockedPackages = capsules.map((capsules) => {
-      return capsules.appPackageName;
-    });
-    VpnAppBlockerModule.startVpn(blockedPackages);
+    const isVpnReady = await VpnAppBlockerModule.requestVpnPermission();
+    if (!isVpnReady) return;
+    const capsules = await readAllCapsules();
+    VpnAppBlockerModule.startVpn(capsules);
   };
 
   return (

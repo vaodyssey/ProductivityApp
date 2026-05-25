@@ -8,6 +8,8 @@ import expo.modules.kotlin.Promise
 import expo.modules.kotlin.exception.Exceptions
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 class VpnAppBlockerModule : Module() {
@@ -70,7 +72,7 @@ class VpnAppBlockerModule : Module() {
       vpnPermissionPromise = promise
       activity.startActivityForResult(prepareIntent, REQUEST_CODE_VPN_PERMISSION)
     }
-    AsyncFunction("startVpn") { blacklistedPackages: List<String>, promise: Promise ->
+    AsyncFunction("startVpn") { blacklistedPackages: List<Map<String, Any>>, promise: Promise ->
       try {
         val context: Context = appContext.reactContext ?: throw Exceptions.ReactContextLost()
         if (VpnService.prepare(context) != null) {
@@ -82,14 +84,25 @@ class VpnAppBlockerModule : Module() {
           return@AsyncFunction
         }
 
-      val serviceIntent = Intent(context, VpnAppBlockerService::class.java)
-      serviceIntent.putExtra("action", "START_VPN")
+        val serviceIntent = Intent(context, VpnAppBlockerService::class.java)
+
+        serviceIntent.putExtra("action", "START_VPN")
+
+        val jsonArray = JSONArray()
+        blacklistedPackages.forEach { capsule ->
+          jsonArray.put(JSONObject().apply {
+            put("id", capsule["id"])
+            put("badHabitName", capsule["badHabitName"])
+            put("appPackageName", capsule["appPackageName"])
+            put("imageUrl", capsule["imageUrl"])
+          })
+        }
+        serviceIntent.putExtra("blacklistedPackages", jsonArray.toString())
         context.startService(serviceIntent)
         promise.resolve(true)
       } catch (e: Exception) {
         promise.resolve(false)
       }
     }
-
   }
 }

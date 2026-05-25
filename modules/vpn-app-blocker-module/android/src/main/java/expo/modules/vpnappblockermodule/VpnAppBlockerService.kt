@@ -15,9 +15,12 @@ import android.os.Process
 import android.provider.Settings
 import android.util.Log
 import androidx.annotation.RequiresApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.net.InetSocketAddress
+import kotlin.concurrent.thread
 
 
 /**
@@ -31,7 +34,7 @@ class VpnAppBlockerService : VpnService() {
   private lateinit var vpnThread: Thread
   private lateinit var vpnInterface: ParcelFileDescriptor // a unique, non-negative number
   private var notificationService: NotificationService? = null
-  private val notificationServiceConnection = object: ServiceConnection {
+  private val notificationServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
       // This is called when the connection with the service has been
       // established, giving us the service object we can use to
@@ -55,7 +58,7 @@ class VpnAppBlockerService : VpnService() {
   private var isNotificationServiceBound = false;
 
   private var extractPkgNameFromBufferService: ExtractPkgNameFromBufferService? = null
-  private val extractPkgNameFromBufferServiceConnection = object: ServiceConnection {
+  private val extractPkgNameFromBufferServiceConnection = object : ServiceConnection {
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
       val binder: ExtractPkgNameFromBufferService.ExtractPkgNameFromBufferServiceBinder =
         p1 as ExtractPkgNameFromBufferService.ExtractPkgNameFromBufferServiceBinder
@@ -71,62 +74,159 @@ class VpnAppBlockerService : VpnService() {
 
   override fun onCreate() {
     super.onCreate()
+//    val notifServiceIntent = Intent(this, NotificationService::class.java)
+//    bindService(notifServiceIntent, notificationServiceConnection, Context.BIND_AUTO_CREATE)
+//
+//    val extractPkgNameServiceIntent = Intent(this, ExtractPkgNameFromBufferService::class.java)
+//    bindService(
+//      extractPkgNameServiceIntent,
+//      extractPkgNameFromBufferServiceConnection,
+//      Context.BIND_AUTO_CREATE
+//    )
+  }
+
+  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val notifServiceIntent = Intent(this, NotificationService::class.java)
     bindService(notifServiceIntent, notificationServiceConnection, Context.BIND_AUTO_CREATE)
 
     val extractPkgNameServiceIntent = Intent(this, ExtractPkgNameFromBufferService::class.java)
-    bindService(extractPkgNameServiceIntent, extractPkgNameFromBufferServiceConnection, Context.BIND_AUTO_CREATE)
-  }
+    bindService(
+      extractPkgNameServiceIntent,
+      extractPkgNameFromBufferServiceConnection,
+      Context.BIND_AUTO_CREATE
+    )
 
-  override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     val action = intent?.getStringExtra("action")
-    if(action.equals("START_VPN")) startVpn()
+    val json = intent?.getStringExtra("blacklistedPackages") ?: return START_NOT_STICKY
+    if (action.equals("START_VPN")) startVpn(json)
     return START_STICKY
   }
 
   private val notifiedPackages = mutableSetOf<String>()
 
-  fun startVpn() {
+  fun startVpn(blacklistedPackagesString: String) {
+    val result = JsonSerializer.deserialize(blacklistedPackagesString)
+    val blacklistedPackages = result.map { map ->
+      Capsule(
+        id = map["id"] as Int,
+        badHabitName = map["badHabitName"] as String,
+        appPackageName = map["appPackageName"] as String,
+        imageUrl = map["imageUrl"] as String,
+      )
+    }
     notificationService?.createOveruseNotificationChannel()
     vpnThread = Thread {
-      try {
-        // Create a new VPN Builder
-        val builder = Builder()
+      val builder = Builder()
 
-        // Set the VPN parameters
-        //TODO: Switch this to getString approach whenever we have time.
-        builder.setSession("ProductivityApp")
-          .addAddress("10.0.0.1", 24)
-          .addRoute("0.0.0.0", 0)
-          .setMtu(1500)
-          .addAllowedApplication("com.facebook.katana")
-        // Establish the VPN connection
-        vpnInterface = builder.establish()!!
+      builder.setSession("ProductivityApp")
+        .addAddress("10.0.0.1", 24)
+        .addRoute("0.0.0.0", 0)
+        .setMtu(1500)
 
-        // Redirect network traffic through the VPN interface
-        val vpnInput = FileInputStream(vpnInterface.fileDescriptor)
-        val vpnOutput = FileOutputStream(vpnInterface.fileDescriptor)
-        val buffer = ByteArray(32767)
+      blacklistedPackages.forEach { capsule ->
+        builder.addAllowedApplication(capsule.appPackageName)
+      }
 
-        while (true) {
-          // Block until a packet arrives, then discard it
-          val length = vpnInput.read(buffer)
-          if (length > 0) {
-            val packageName = extractPkgNameFromBufferService?.getPackageFromBuffer(buffer, length) ?: continue
-            notificationService?.sendOveruseNotification(packageName)
-            notifiedPackages.add(packageName)
-            Log.v(TAG, "Packet from: $packageName — $length bytes (black-holed)")
-            Log.v(TAG, "Discarded $length bytes (packet black-holed)")
-          }
+      vpnInterface = builder.establish()!!
+
+      val vpnInput = FileInputStream(vpnInterface.fileDescriptor)
+      val vpnOutput = FileOutputStream(vpnInterface.fileDescriptor)
+      val buffer = ByteArray(32767)
+
+      while (true) {
+        val length = vpnInput.read(buffer)
+        if (length > 0) {
+          val packageName =
+            extractPkgNameFromBufferService?.getPackageFromBuffer(buffer, length) ?: continue
+          val matchedCapsule = blacklistedPackages.find { it.appPackageName == packageName }
+
+          notificationService?.sendOveruseNotification(packageName)
+          notifiedPackages.add(packageName)
+          Log.v(TAG, "Packet from: $packageName — $length bytes (black-holed)")
+          Log.v(TAG, "Discarded $length bytes (packet black-holed)")
         }
-      } catch (e: Exception) {
-        // Handle VPN connection errors
-        e.printStackTrace()
-      } finally {
-//        stopVpn()
       }
     }
+
+//    thread {
+//      createVpn(blacklistedPackages, notificationService )
+//    }
+//    vpnThread = Thread {
+//      try {
+//        // Create a new VPN Builder
+//        val builder = Builder()
+//
+//        // Set the VPN parameters
+//        //TODO: Switch this to getString approach whenever we have time.
+//        builder.setSession("ProductivityApp")
+//          .addAddress("10.0.0.1", 24)
+//          .addRoute("0.0.0.0", 0)
+//          .setMtu(1500)
+//          .addAllowedApplication("com.facebook.katana")
+//        // Establish the VPN connection
+//        vpnInterface = builder.establish()!!
+//
+//        // Redirect network traffic through the VPN interface
+//        val vpnInput = FileInputStream(vpnInterface.fileDescriptor)
+//        val vpnOutput = FileOutputStream(vpnInterface.fileDescriptor)
+//        val buffer = ByteArray(32767)
+//
+//        while (true) {
+//          // Block until a packet arrives, then discard it
+//          val length = vpnInput.read(buffer)
+//          if (length > 0) {
+//            val packageName =
+//              extractPkgNameFromBufferService?.getPackageFromBuffer(buffer, length) ?: continue
+//            notificationService?.sendOveruseNotification(packageName)
+//            notifiedPackages.add(packageName)
+//            Log.v(TAG, "Packet from: $packageName — $length bytes (black-holed)")
+//            Log.v(TAG, "Discarded $length bytes (packet black-holed)")
+//          }
+//        }
+//      } catch (e: Exception) {
+//        // Handle VPN connection errors
+//        e.printStackTrace()
+//      } finally {
+////        stopVpn()
+//      }
+//    }
     vpnThread.start()
+  }
+
+  private fun createVpn(
+    blacklistedPackages: List<Capsule>,
+    notificationService: NotificationService?
+  ) {
+    val builder = Builder()
+
+    builder.setSession("ProductivityApp")
+      .addAddress("10.0.0.1", 24)
+      .addRoute("0.0.0.0", 0)
+      .setMtu(1500)
+
+    blacklistedPackages.forEach { capsule ->
+      builder.addAllowedApplication(capsule.appPackageName)
+    }
+
+    vpnInterface = builder.establish()!!
+
+    val vpnInput = FileInputStream(vpnInterface.fileDescriptor)
+    val vpnOutput = FileOutputStream(vpnInterface.fileDescriptor)
+    val buffer = ByteArray(32767)
+
+    while (true) {
+      val length = vpnInput.read(buffer)
+      if (length > 0) {
+        val packageName =
+          extractPkgNameFromBufferService?.getPackageFromBuffer(buffer, length) ?: continue
+        val matchedCapsule = blacklistedPackages.find { it.appPackageName == packageName }
+
+        notificationService?.sendOveruseNotification(packageName, matchedCapsule?.imageUrl)
+        notifiedPackages.add(packageName)
+        Log.v(TAG, "Packet from: $packageName — $length bytes (black-holed)")
+        Log.v(TAG, "Discarded $length bytes (packet black-holed)")
+      }
+    }
   }
 
   private fun stopVpn() {
@@ -137,5 +237,3 @@ class VpnAppBlockerService : VpnService() {
     }
   }
 }
-
-
