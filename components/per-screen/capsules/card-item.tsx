@@ -1,13 +1,13 @@
 import { COLOR_PRIMARY, COLOR_RED } from "@/constants/colors";
 import { SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
-import { Capsule } from "@/models/Capsule";
-import { deleteCapsule } from "@/utils/expo/sqlite/capsules-repository";
+import { Capsule } from "@/models/capsule";
 import { Ionicons } from "@expo/vector-icons";
 import { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
-import React from "react";
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ConfirmDeletePasswordModal } from "./confirm-delete-password-modal";
 
 interface CardItemProps {
   capsule: Capsule;
@@ -19,36 +19,7 @@ export const CardItem: React.FC<CardItemProps> = ({
   onPressDelete,
 }) => {
   const router = useRouter();
-  const handleDeleteConfirmation = (id?: number) => {
-    if (!id) return;
-    Alert.alert(
-      "Delete Capsule",
-      "Are you sure you want to delete this capsule?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: () => handleDelete(id),
-        },
-      ],
-    );
-  };
-  const handleDelete = async (id: number | undefined) => {
-    try {
-      if (!id) return;
-
-      if (typeof window !== "undefined") {
-        console.log(`Deleting capsule with ID: ${id}`);
-      }
-
-      await deleteCapsule(id);
-      onPressDelete && onPressDelete();
-    } catch (error) {
-      console.error("Failed to delete capsule:", error);
-    }
-  };
-
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const updateCapsule = (id: number | undefined) => {
     router.navigate({ pathname: "/create-capsule", params: { id } });
   };
@@ -70,7 +41,7 @@ export const CardItem: React.FC<CardItemProps> = ({
 
       {/* Right Side: Delete Button */}
       <TouchableOpacity
-        onPress={() => handleDeleteConfirmation(capsule.id)}
+        onPress={() => setModalVisible(true)}
         activeOpacity={0.7}
       >
         <Ionicons
@@ -79,6 +50,12 @@ export const CardItem: React.FC<CardItemProps> = ({
           color={COLOR_RED}
         />
       </TouchableOpacity>
+      <ConfirmDeletePasswordModal
+        capsule={capsule}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        onPressDelete={onPressDelete}
+      />
     </View>
   );
 };

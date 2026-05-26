@@ -1,5 +1,5 @@
 import { CAPSULE_TABLE_NAME, DATABASE_NAME } from "@/constants/database";
-import { Capsule } from "@/models/Capsule";
+import { Capsule } from "@/models/capsule";
 import * as SQLite from "expo-sqlite";
 
 // Global DB Instance (Optional, initialized at startup)

@@ -4,7 +4,7 @@ import Button, { ButtonVariants } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
-import { Capsule } from "@/models/Capsule";
+import { Capsule } from "@/models/capsule";
 import { readAllCapsules } from "@/utils/expo/sqlite/capsules-repository";
 import { usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";

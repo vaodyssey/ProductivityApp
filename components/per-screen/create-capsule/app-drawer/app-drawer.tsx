@@ -1,12 +1,12 @@
 import Divider from "@/components/ui/divider";
 import Spinner from "@/components/ui/spinner";
 import { DRAWER_COLUMNS_COUNT, SCREEN_WIDTH } from "@/constants/dimensions";
-import { Capsule } from "@/models/Capsule";
+import { Capsule } from "@/models/capsule";
 import AppListModule from "@/modules/app-list-module";
 import BottomSheet, {
-    BottomSheetBackdrop,
-    BottomSheetFlatList,
-    SCREEN_HEIGHT,
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+  SCREEN_HEIGHT,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";

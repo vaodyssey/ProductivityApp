@@ -1,13 +1,14 @@
+import { SetPasswordModal } from "@/components/per-screen/index/set-password-modal";
 import { showAlertDialog } from "@/components/ui/alert-dialog";
 import Button, { ButtonVariants } from "@/components/ui/button";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import VpnAppBlockerModule from "@/modules/vpn-app-blocker-module/src/VpnAppBlockerModule";
 import { readAllCapsules } from "@/utils/expo/sqlite/capsules-repository";
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 const IndexScreen = () => {
-  // const [capsules, setCapsules] = useState<Capsule[]>([]);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const revokeVpnPermission = async () => {
     const vpnIsStopped = await VpnAppBlockerModule.stopVpn();
@@ -56,6 +57,15 @@ const IndexScreen = () => {
         label="Revoke VPN permission"
         variant={ButtonVariants.PRIMARY}
         onPress={revokeVpnPermission}
+      />
+      <Button
+        label="Set Password"
+        variant={ButtonVariants.PRIMARY}
+        onPress={() => setModalVisible(true)}
+      />
+      <SetPasswordModal
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
       />
     </View>
   );

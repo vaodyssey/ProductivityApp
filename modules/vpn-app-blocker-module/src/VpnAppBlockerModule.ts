@@ -1,5 +1,5 @@
 // VpnAppBlockerModule.ts
-import { Capsule } from "@/models/Capsule";
+import { Capsule } from "@/models/capsule";
 import { NativeModule, requireNativeModule } from "expo";
 import {
   VpnAppBlockerModuleEvents,

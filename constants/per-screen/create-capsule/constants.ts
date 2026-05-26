@@ -1,4 +1,4 @@
-import { Capsule } from "@/models/Capsule";
+import { Capsule } from "@/models/capsule";
 
 export const DEFAULT_CAPSULE: Capsule = {
   id: undefined,

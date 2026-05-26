@@ -5,7 +5,7 @@ import TextInput from "@/components/ui/text-input";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import { CapsuleFormMode } from "@/constants/per-screen/create-capsule/constants";
 import FONT_STYLES from "@/constants/text";
-import { Capsule } from "@/models/Capsule";
+import { Capsule } from "@/models/capsule";
 import {
   createCapsule,
   initDatabase,
