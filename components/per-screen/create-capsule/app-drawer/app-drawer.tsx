@@ -4,16 +4,16 @@ import { DRAWER_COLUMNS_COUNT, SCREEN_WIDTH } from "@/constants/dimensions";
 import { Capsule } from "@/models/Capsule";
 import AppListModule from "@/modules/app-list-module";
 import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetFlatList,
-  SCREEN_HEIGHT,
+    BottomSheetBackdrop,
+    BottomSheetFlatList,
+    SCREEN_HEIGHT,
 } from "@gorhom/bottom-sheet";
 import { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
 import { BottomSheetMethods } from "@gorhom/bottom-sheet/lib/typescript/types";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { ListRenderItemInfo, StyleSheet, Text } from "react-native";
-import { BOTTOM_SHEET_SNAP_POINTS } from "../constants";
+import { BOTTOM_SHEET_SNAP_POINTS } from "../../../../constants/per-screen/create-capsule/constants";
 import { AppGridItem } from "./app-grid-item";
 import { AppSearchBar } from "./app-search-bar";
 import { AppItem, BaseProps } from "./types";

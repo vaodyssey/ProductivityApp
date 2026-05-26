@@ -1,6 +1,6 @@
 import { NativeModule, requireNativeModule } from "expo";
 
-import { AppItem } from "@/app/create-capsule/app-drawer/types";
+import { AppItem } from "@/components/per-screen/create-capsule/app-drawer/types";
 import { AppListModuleEvents } from "./AppListModule.types";
 
 declare class AppListModule extends NativeModule<AppListModuleEvents> {

@@ -1,12 +1,15 @@
+import CapsuleForm from "@/components/per-screen/create-capsule/create-capsule-form";
 import { useChangeScreenTitle } from "@/hooks/useChangeScreenTitle";
 import { Capsule } from "@/models/Capsule";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import { CapsuleFormMode, DEFAULT_CAPSULE } from "./constants";
-import CapsuleForm from "./create-capsule-form";
-import { useCapsule } from "./hooks/useCapsule";
+import {
+  CapsuleFormMode,
+  DEFAULT_CAPSULE,
+} from "../../constants/per-screen/create-capsule/constants";
+import { useCapsule } from "../../hooks/per-screen/create-capsule/useCapsule";
 
 const CreateCapsuleScreen: React.FC = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();

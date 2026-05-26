@@ -1,8 +1,9 @@
-import { AppDrawer } from "@/app/create-capsule/app-drawer/app-drawer";
 import ImagePickerWrapper from "@/components/image-picker-wrapper";
+import { AppDrawer } from "@/components/per-screen/create-capsule/app-drawer/app-drawer";
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
+import { CapsuleFormMode } from "@/constants/per-screen/create-capsule/constants";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/Capsule";
 import {
@@ -15,7 +16,6 @@ import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
 import { FieldErrors, useFormContext } from "react-hook-form";
 import { StyleSheet, Text, View } from "react-native";
-import { CapsuleFormMode } from "./constants";
 
 interface CapsuleFormProps {
   mode: CapsuleFormMode;

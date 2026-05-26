@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import myImage from "../../../assets/images/favicon.png";
+import myImage from "../../../../assets/images/favicon.png";
 import { AppItem } from "./types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");

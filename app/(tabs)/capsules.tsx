@@ -8,7 +8,7 @@ import { Capsule } from "@/models/Capsule";
 import { readAllCapsules } from "@/utils/expo/sqlite/capsules-repository";
 import { usePathname, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
-import { CardItem } from "./card-item";
+import { CardItem } from "../../components/per-screen/capsules/card-item";
 
 const CapsulesScreen = () => {
   const router = useRouter();

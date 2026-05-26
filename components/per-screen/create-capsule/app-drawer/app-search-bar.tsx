@@ -4,7 +4,7 @@ import Feather from "@expo/vector-icons/Feather";
 import { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import { useEffect, useState } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { useDebounce } from "../hooks/useDebounce";
+import { useDebounce } from "../../../../hooks/per-screen/create-capsule/useDebounce";
 import { AppItem } from "./types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");

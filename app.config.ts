@@ -48,6 +48,7 @@ module.exports = () => ({
       ],
       "expo-sqlite",
       ["./plugins/withPlugin.ts"],
+      "expo-secure-store",
     ],
     experiments: {
       typedRoutes: true,
