@@ -26,29 +26,16 @@ interface ButtonProps {
 const styles = StyleSheet.create({
   button: {
     width: "100%",
-    height: "100%",
+    height: SCREEN_HEIGHT * 0.06,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: SCREEN_WIDTH * 0.1,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    fontSize: 14,
-    fontWeight: "bold",
-    textTransform: "uppercase",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
   },
   primaryButton: {
     backgroundColor: COLOR_PRIMARY,
   },
   dangerButton: {
     backgroundColor: COLOR_RED,
-  },
-  buttonSizeSm: {
-    width: SCREEN_WIDTH * 0.25,
-    height: SCREEN_HEIGHT * 0.05,
   },
   spinner: {
     fontSize: 14,
@@ -81,7 +68,6 @@ export default function Button(props: ButtonProps) {
         variant === ButtonVariants.PRIMARY
           ? styles.primaryButton
           : styles.dangerButton,
-        styles.buttonSizeSm,
       ]}
       onPress={onPress}
       disabled={isLoading}
@@ -91,7 +77,7 @@ export default function Button(props: ButtonProps) {
       ) : (
         <Text
           style={{
-            ...FONT_STYLES.H3_STYLE,
+            ...FONT_STYLES.LABEL_STYLE,
             color: COLOR_WHITE,
             textAlign: "center",
           }}

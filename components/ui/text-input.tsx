@@ -1,21 +1,29 @@
 // import React from "react";
+import FONT_STYLES from "@/constants/text";
+import { JSX } from "react";
+import { Controller, useFormContext } from "react-hook-form";
 import {
-    Platform,
-    TextInput as RNTextInput,
-    StyleSheet,
-    Text,
-    TextInputProps,
-    View,
+  Platform,
+  TextInput as RNTextInput,
+  StyleSheet,
+  Text,
+  TextInputProps,
+  TouchableOpacity,
 } from "react-native";
 
 interface TextInputExtendedProps extends TextInputProps {
   label?: string;
   error?: string;
+  onTextInputPress?: () => void;
+  name?: string;
+  leadingIcon?: JSX.Element;
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "column",
+    flexDirection: "row",
+    alignItems: "center",
+    width: "100%",
     gap: 8,
   },
   labelSection: {
@@ -59,16 +67,36 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function TextInput({ label, ...props }: TextInputExtendedProps) {
+export default function TextInput({
+  label,
+  leadingIcon,
+  ...props
+}: TextInputExtendedProps) {
+  const { control } = useFormContext();
   return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <RNTextInput
-        style={[styles.input, props.style]}
-        editable={!props.editable}
-        {...props}
-      />
-      {props.error && <Text style={styles.errorText}>{props.error}</Text>}
-    </View>
+    <Controller
+      control={control}
+      name={props.name ?? ""}
+      render={({ field: { onChange, onBlur, value } }) => (
+        <TouchableOpacity
+          style={styles.container}
+          onPress={props.onTextInputPress && props.onTextInputPress}
+        >
+          {leadingIcon && leadingIcon}
+          {label && (
+            <Text style={[styles.label, FONT_STYLES.LABEL_STYLE]}>{label}</Text>
+          )}
+          <RNTextInput
+            style={[styles.input, props.style]}
+            editable={!props.editable}
+            value={value}
+            onBlur={onBlur}
+            onChangeText={onChange}
+            {...props}
+          />
+          {props.error && <Text style={styles.errorText}>{props.error}</Text>}
+        </TouchableOpacity>
+      )}
+    />
   );
 }

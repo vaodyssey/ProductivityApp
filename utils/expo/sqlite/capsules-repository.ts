@@ -1,5 +1,5 @@
 import { CAPSULE_TABLE_NAME, DATABASE_NAME } from "@/constants/database";
-import { Capsule } from "@/models/Capsule";
+import { Capsule } from "@/models/capsule";
 import * as SQLite from "expo-sqlite";
 
 // Global DB Instance (Optional, initialized at startup)
@@ -116,4 +116,20 @@ async function ensureOpenDatabase(): Promise<SQLite.SQLiteDatabase> {
     dbInstance = initialDb;
   }
   return dbInstance;
+}
+
+export async function updateCapsule(
+  capsule: Capsule,
+  db?: SQLite.SQLiteDatabase,
+): Promise<number> {
+  const targetDb = db || (await ensureOpenDatabase());
+  if (!capsule.id) return 0;
+  const result = await targetDb.runAsync(
+    "UPDATE capsules SET badHabitName = ?, appPackageName = ?, imageUrl = ? WHERE id = ?",
+    capsule.badHabitName,
+    capsule.appPackageName,
+    capsule.imageUrl,
+    capsule.id,
+  );
+  return result.changes;
 }

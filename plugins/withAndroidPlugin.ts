@@ -36,15 +36,15 @@ const services: AndroidManifestService[] = [
   },
   {
     $: {
-      "android:name": "expo.modules.vpnappblockermodule.NotificationService",
+      "android:name":
+        "expo.modules.vpnappblockermodule.services.NotificationService",
       "android:exported": "false",
-      "android:permission": "android.permission.POST_NOTIFICATIONS",
     },
   },
   {
     $: {
       "android:name":
-        "expo.modules.vpnappblockermodule.ExtractPkgNameFromBufferService",
+        "expo.modules.vpnappblockermodule.services.ExtractPkgNameFromBufferService",
       "android:exported": "false",
     },
   },

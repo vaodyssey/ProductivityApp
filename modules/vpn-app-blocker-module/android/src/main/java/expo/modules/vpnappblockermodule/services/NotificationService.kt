@@ -1,18 +1,20 @@
-package expo.modules.vpnappblockermodule
+package expo.modules.vpnappblockermodule.services
 
-import android.app.Notification
+import android.R
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Binder
 import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import java.net.URL
 
-
-@RequiresApi(Build.VERSION_CODES.O)
+@RequiresApi(Build.VERSION_CODES.Q)
 
 class NotificationService : Service() {
   private val OVERUSE_NOTIFICATION_CHANNEL_ID = "vpn_overuse_channel"
@@ -40,7 +42,7 @@ class NotificationService : Service() {
     notificationManager.createNotificationChannel(channel)
   }
 
-  fun sendOveruseNotification(packageName: String) {
+  fun sendOveruseNotification(packageName: String, imageUrl: String?) {
     val appName = try {
       packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageName, 0))
         .toString()
@@ -48,15 +50,27 @@ class NotificationService : Service() {
       packageName // fallback to raw package name if label not found
     }
 
-    val notification = NotificationCompat.Builder(this, OVERUSE_NOTIFICATION_CHANNEL_ID)
+    val notificationBuilder = NotificationCompat.Builder(this, OVERUSE_NOTIFICATION_CHANNEL_ID)
       .setContentTitle("Hey, are you trying to detach from your desired self?")
       .setContentText("$appName is attempting to access the internet.").setStyle(
         NotificationCompat.BigTextStyle().bigText(
-            "$appName is attempting to access the internet.\n\n" + "Stay strong — you set this limit for a reason. 💪"
-          )
-      ).setSmallIcon(android.R.drawable.ic_dialog_alert)
-      .setPriority(NotificationCompat.PRIORITY_HIGH).setAutoCancel(true).build()
+          "$appName is attempting to access the internet.\n\n" + "Stay strong — you set this limit for a reason. 💪"
+        )
+      ).setSmallIcon(R.drawable.ic_dialog_alert)
+      .setPriority(NotificationCompat.PRIORITY_HIGH).setAutoCancel(true)
 
+      .setAutoCancel(true)
+
+    if (!imageUrl.isNullOrEmpty()) {
+      val bitmap = URL(imageUrl).openStream().use { BitmapFactory.decodeStream(it) }
+      notificationBuilder.setStyle(
+        NotificationCompat.BigPictureStyle()
+          .bigPicture(bitmap)
+          .setBigContentTitle("Hey, are you trying to detach from your desired self?")
+          .setSummaryText("$appName is attempting to access the internet.")
+      )
+    }
+    val notification = notificationBuilder.build()
     val notificationManager = getSystemService(NotificationManager::class.java)
     // Use packageName.hashCode() so each blocked app gets its own notification slot
     notificationManager.notify(packageName.hashCode(), notification)
