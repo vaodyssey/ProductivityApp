@@ -89,16 +89,34 @@ const IndexScreen = () => {
   }));
 
   const pan = Gesture.Pan()
+    .hitSlop({
+      top: -SCREEN_HEIGHT * 0.8,
+    })
     .onUpdate((event) => {
       translateY.value = event.translationY;
       scrollY.value = -event.translationY; // Negative because swipe down = scroll up
     })
-    .onEnd(() => {
+    .onEnd((event) => {
       // Snap to nearest section
-      if (Math.abs(translateY.value) > 50) {
-        scrollY.value = scrollY.value > 300 ? 300 : 0;
-      } else {
+      const isSwipingUp = event.velocityY < 0 || translateY.value < -50;
+      const isSwipingDown = event.velocityY > 0 || translateY.value > 50;
+      console.log(`end translateY values: ${translateY.value}`);
+      console.log(`end scrollY values: ${scrollY.value}`);
+      if (
+        // Math.abs(translateY.value) > 50 &&
+        isSwipingUp
+        // scrollY.value < 300
+      ) {
+        scrollY.value = 300;
+      } else if (
+        isSwipingDown
+        // -50 < translateY.value &&
+        // translateY.value < 0 &&
+        // scrollY.value >= 300
+      ) {
         scrollY.value = 0;
+      } else {
+        scrollY.value = scrollY.value > 300 ? 300 : 0;
       }
       translateY.value = 0;
     });

@@ -13,6 +13,22 @@
   - A mascot in the middle of the screen, right underneath the short phrase. Takes up the rest of the screen in the middle, and defaults to happy Hard-coded image for now at `assets\images\mascot.png`.
   - A hint text "Scroll for More" at the bottom. Stick to the bottom of the component.
 - Background color: `COLOR_LIGHT_BLUE` at `constants\colors.ts`. Will upgrade to gradient color in the future.
+- A button right below the buddy/mascot, allowing toggle between **_Buddy Mode_** and **_To-do mode_**
+  - Buddy mode: Simply displaying the Mascot/Buddy, with the mood based on the habit completion rate (current status)
+  - To-do mode: See **## Progress Buddy > To do Mode** description.
+
+## Progress Buddy > To do Mode
+
+- A section displaying daily to-do tasks
+- Contains a horizontal scroll of HabitCards
+- HabitCard design:
+  - Square with rounded corners (use SCREEN_WIDTH multiplied by a number) for border-radius value
+  - `FONT_STYLES.H3` on top left, default black color
+  - Has backgroundImage temporarily set to `assets\images\icon.png`. Will be the image the user set on creating a capsule.
+  - Has its own opacity. The higher weekly completion is, the clearer the background image will be.
+  - Complete/Revert button at the bottom of the card (with built-in loading animation)
+- HabitCard location: `components\per-screen\index`
+- (TESTING, TO BE REMOVED IN THE FUTURE) - Mock 3 HabitCards (within To do mode), make sure they're horizontally scrollable.
 
 ## My Top Habits
 

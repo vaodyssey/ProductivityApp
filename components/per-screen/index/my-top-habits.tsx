@@ -93,7 +93,7 @@ export const MyTopHabits = () => {
   return (
     <View style={{ ...styles.container }}>
       <Text style={[styles.leaderboardTitle, FONT_STYLES.H1_STYLE]}>
-        This week's Leaderboard
+        Weekly Leaderboard
       </Text>
       <View style={styles.top3Section}>
         {top3.map((capsule, index) => (
@@ -105,6 +105,9 @@ export const MyTopHabits = () => {
           <RemainingHabitItem key={capsule.id} capsule={capsule} />
         ))}
       </View>
+      <Text style={[styles.hint, FONT_STYLES.H5_STYLE]}>
+        Swipe Down to Return
+      </Text>
     </View>
   );
 };
@@ -118,8 +121,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: SCREEN_WIDTH * 0.06,
-    paddingVertical: SCREEN_HEIGHT * 0.01,
-    gap: SCREEN_HEIGHT * 0.1,
+    paddingVertical: SCREEN_HEIGHT * 0.2,
+    gap: SCREEN_HEIGHT * 0.08,
   },
   leaderboardTitle: {
     textAlign: "center",
@@ -185,5 +188,8 @@ const styles = StyleSheet.create({
   },
   remainingCount: {
     color: COLOR_GREY,
+  },
+  hint: {
+    opacity: 0.6,
   },
 });

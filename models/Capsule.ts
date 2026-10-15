@@ -1,6 +1,8 @@
 export interface Capsule {
-  id?: number;
+  id: string;
   badHabitName: string;
   appPackageName: string;
   imageUrl: string;
+  completedThisWeek: number;
+  weeklyGoal: number;
 }
