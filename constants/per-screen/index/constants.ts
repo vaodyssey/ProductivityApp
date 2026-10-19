@@ -1,4 +1,4 @@
-import { SCREEN_WIDTH } from "@/constants/dimensions";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import { Capsule } from "@/models/capsule";
 
 export const PROGRESS_BUDDY_PHRASE = "You've got this sweetie!";
@@ -53,6 +53,8 @@ export const MOCK_CAPSULES: Capsule[] = [
 ];
 
 export const HABIT_CARD_WIDTH = SCREEN_WIDTH * 0.8;
+export const HABIT_CARD_HEIGHT = SCREEN_HEIGHT * 0.45;
+
 export const GAP_BETWEEN_HABIT_CARDS = 0.01;
 export const FLATLIST_SNAP_INTERVAL =
-  HABIT_CARD_WIDTH + GAP_BETWEEN_HABIT_CARDS;
+  HABIT_CARD_HEIGHT + GAP_BETWEEN_HABIT_CARDS;

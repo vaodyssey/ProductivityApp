@@ -1,5 +1,8 @@
 import Button from "@/components/ui/button";
-import { HABIT_CARD_WIDTH } from "@/constants/per-screen/index/constants";
+import {
+  HABIT_CARD_HEIGHT,
+  HABIT_CARD_WIDTH,
+} from "@/constants/per-screen/index/constants";
 import { Capsule } from "@/models/capsule";
 import { SCREEN_WIDTH } from "@gorhom/bottom-sheet";
 import React from "react";
@@ -42,11 +45,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ capsule }) => {
 
   return (
     <View style={styles.cardContainer}>
-      <Image
-        source={require("../../../assets/images/mascot.png")}
-        style={styles.bgImage}
-      />
-
+      <Image source={require("../../../assets/images/mascot.png")} />
       <BackgroundOverlay capsule={capsule} />
     </View>
   );
@@ -56,6 +55,7 @@ const styles = StyleSheet.create({
   cardContainer: {
     backgroundColor: "#f0f0f0", // Base background color
     width: HABIT_CARD_WIDTH,
+    height: HABIT_CARD_HEIGHT,
     borderRadius: 12, // Using a rounded corner style
     overflow: "hidden", // Ensures the overlay respects borders
     elevation: 3,
@@ -63,6 +63,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    justifyContent: "center",
+    alignItems: "center",
     position: "relative",
   },
   backgroundOverlay: {
@@ -77,7 +79,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between", // Pushes name to top and button to bottom
   },
-  bgImage: {},
   habitName: {
     fontSize: 18, // H3 style approximation
     fontWeight: "bold",

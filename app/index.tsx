@@ -9,18 +9,10 @@
 
 import { MyTopHabits } from "@/components/per-screen/index/my-top-habits";
 import { ProgressBuddy } from "@/components/per-screen/index/progress-buddy";
-import { SCREEN_HEIGHT } from "@/constants/dimensions";
-import { SCROLL_FADE_RANGE } from "@/constants/per-screen/index/constants";
+import { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import React from "react";
-import { StyleSheet, View } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, {
-  Extrapolate,
-  interpolate,
-  useAnimatedScrollHandler,
-  useAnimatedStyle,
-  useSharedValue,
-} from "react-native-reanimated";
+import { StyleSheet } from "react-native";
+import { ScrollView } from "react-native-gesture-handler";
 
 const IndexScreen = () => {
   // const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -61,77 +53,17 @@ const IndexScreen = () => {
   //   VpnAppBlockerModule.startVpn(capsules);
   // };
 
-  const scrollY = useSharedValue(0);
-  const translateY = useSharedValue(0);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  const heroAnimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      scrollY.value,
-      [0, SCROLL_FADE_RANGE],
-      [1, 0],
-      Extrapolate.CLAMP,
-    ),
-  }));
-
-  const listAnimStyle = useAnimatedStyle(() => ({
-    opacity: interpolate(
-      scrollY.value,
-      [0, SCROLL_FADE_RANGE],
-      [0, 1],
-      Extrapolate.CLAMP,
-    ),
-  }));
-
-  const pan = Gesture.Pan()
-    .hitSlop({
-      top: -SCREEN_HEIGHT * 0.8,
-    })
-    .onUpdate((event) => {
-      translateY.value = event.translationY;
-      scrollY.value = -event.translationY; // Negative because swipe down = scroll up
-    })
-    .onEnd((event) => {
-      // Snap to nearest section
-      const isSwipingUp = event.velocityY < 0 || translateY.value < -50;
-      const isSwipingDown = event.velocityY > 0 || translateY.value > 50;
-      console.log(`end translateY values: ${translateY.value}`);
-      console.log(`end scrollY values: ${scrollY.value}`);
-      if (
-        // Math.abs(translateY.value) > 50 &&
-        isSwipingUp
-        // scrollY.value < 300
-      ) {
-        scrollY.value = 300;
-      } else if (
-        isSwipingDown
-        // -50 < translateY.value &&
-        // translateY.value < 0 &&
-        // scrollY.value >= 300
-      ) {
-        scrollY.value = 0;
-      } else {
-        scrollY.value = scrollY.value > 300 ? 300 : 0;
-      }
-      translateY.value = 0;
-    });
   return (
-    <GestureDetector gesture={pan}>
-      <View style={styles.container}>
-        <Animated.View style={[styles.hero, heroAnimStyle]}>
-          <ProgressBuddy />
-        </Animated.View>
-
-        <Animated.View style={[styles.listContainer, listAnimStyle]}>
-          <MyTopHabits />
-        </Animated.View>
-      </View>
-    </GestureDetector>
+    <ScrollView
+      style={styles.container}
+      showsHorizontalScrollIndicator={false}
+      snapToInterval={SCREEN_HEIGHT} // 👈 Tells ScrollView where to stop
+      snapToAlignment="center"
+      decelerationRate="fast"
+    >
+      <ProgressBuddy />
+      <MyTopHabits />
+    </ScrollView>
   );
 
   // return (
@@ -162,17 +94,6 @@ const IndexScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: "relative",
-  },
-  hero: {
-    height: SCREEN_HEIGHT,
-    // width: "100%",
-    zIndex: 6,
-  },
-  listContainer: {
-    // backgroundColor: "#D6F3FF",
-    position: "absolute",
-    zIndex: 5,
   },
 });
 

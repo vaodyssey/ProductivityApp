@@ -4,21 +4,20 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import {
   FLATLIST_SNAP_INTERVAL,
   GAP_BETWEEN_HABIT_CARDS,
+  HABIT_CARD_HEIGHT,
   MOCK_CAPSULES,
   PROGRESS_BUDDY_HINT,
   PROGRESS_BUDDY_PHRASE,
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
 
-import Button from "@/components/ui/button";
+import HorizontalSwiper from "@/components/HorizontalSwiper";
 import { Capsule } from "@/models/capsule";
-import React, { useState } from "react";
+import React from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import HabitCard from "./HabitCard";
 
 export const ProgressBuddy = () => {
-  const [isBuddyMode, setIsBuddyMode] = useState(true);
-
   return (
     <LinearGradientBackground
       colors={LINEAR_GRADIENT_2}
@@ -29,35 +28,51 @@ export const ProgressBuddy = () => {
         <Text style={[styles.phrase, FONT_STYLES.H1_STYLE]}>
           {PROGRESS_BUDDY_PHRASE}
         </Text>
-        <View style={styles.mainContainer}>
-          {isBuddyMode ? (
-            <Image
-              source={require("../../../assets/images/mascot.png")}
-              style={styles.mascot}
-            />
-          ) : (
-            // To-do Mode View: Horizontal scroll of HabitCards
-            <FlatList
-              data={MOCK_CAPSULES}
-              style={styles.habitCardsFlatList}
-              contentContainerStyle={styles.habitCardFlatlistContainer}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={FLATLIST_SNAP_INTERVAL} // Distance between snapping stops
-              snapToAlignment="center" // Aligns snapped item to "start", "center", or "end"
-              decelerationRate="fast"
-              renderItem={(listRenderItem) => (
-                <HabitCard
-                  key={listRenderItem.item.id}
-                  capsule={listRenderItem.item}
-                />
-              )}
-              keyExtractor={(capsule: Capsule) => capsule.id} // Provides a unique key for tracking elements
-            />
-          )}
-          <Button
-            label={isBuddyMode ? "My To-dos" : "My Buddy"}
-            onPress={() => setIsBuddyMode(!isBuddyMode)}
+        <View style={{ flex: 10 }}>
+          <HorizontalSwiper
+            style={styles.habitCardsScrollView}
+            pages={[
+              {
+                key: "mascot",
+                component: (
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      width: SCREEN_WIDTH * 0.8,
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/images/mascot.png")}
+                      style={styles.mascot}
+                    />
+                  </View>
+                ),
+              },
+              {
+                key: "todo-list",
+                component: (
+                  <View>
+                    <FlatList
+                      data={MOCK_CAPSULES}
+                      style={{ height: HABIT_CARD_HEIGHT, borderRadius: 12 }}
+                      contentContainerStyle={{ gap: GAP_BETWEEN_HABIT_CARDS }}
+                      nestedScrollEnabled
+                      snapToInterval={FLATLIST_SNAP_INTERVAL} // Distance between snapping stops
+                      snapToAlignment="center" // Aligns snapped item to "start", "center", or "end"
+                      decelerationRate="fast"
+                      renderItem={(listRenderItem) => (
+                        <HabitCard
+                          key={listRenderItem.item.id}
+                          capsule={listRenderItem.item}
+                        />
+                      )}
+                      keyExtractor={(capsule: Capsule) => capsule.id} // Provides a unique key for tracking elements
+                    />
+                  </View>
+                ),
+              },
+            ]}
           />
         </View>
         <Text style={[styles.hint, FONT_STYLES.H5_STYLE]}>
@@ -74,6 +89,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: SCREEN_HEIGHT * 0.15,
+
+    flexDirection: "column",
+    // width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+    // justifyContent: "center",
+    // alignItems: "center",
+    // paddingHorizontal: SCREEN_WIDTH * 0.06,
+    // paddingVertical: SCREEN_HEIGHT * 0.2,
+    // gap: SCREEN_HEIGHT * 0.08,
   },
   phrase: {
     color: COLOR_PRIMARY,
@@ -81,25 +105,20 @@ const styles = StyleSheet.create({
     flex: 1, // Allows phrase to take up space
   },
 
-  habitCardsFlatList: {
+  habitCardsScrollView: {
     width: SCREEN_WIDTH * 0.8,
+    // flex: 1,
   },
-  habitCardFlatlistContainer: {
-    gap: GAP_BETWEEN_HABIT_CARDS,
-  },
-  mainContainer: {
-    flex: 4, // Takes up most of the middle screen space
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingBottom: SCREEN_HEIGHT * 0.1,
-  },
+
   mascot: {
-    width: SCREEN_WIDTH * 0.6,
-    resizeMode: "contain",
+    // width: SCREEN_WIDTH * 0.6,
+    // resizeMode: "contain",
+    justifyContent: "center",
   },
   hint: {
     color: COLOR_PRIMARY,
     opacity: 0.6,
+    flex: 1,
     // This hint is only visible in Buddy Mode (handled by conditional rendering)
   },
   horizontalScrollContainer: {
@@ -107,6 +126,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SCREEN_WIDTH * 0.05,
     justifyContent: "space-between",
     alignItems: "center",
+    height: SCREEN_HEIGHT,
   },
   toggleButton: {
     width: "90%", // Make button wide enough to be prominent
@@ -120,5 +140,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  containerItem: {
+    position: "absolute",
+    width: SCREEN_WIDTH * 0.1,
+    top: 0,
   },
 });
