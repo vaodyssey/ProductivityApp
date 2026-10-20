@@ -1,8 +1,15 @@
 import { COLOR_PRIMARY, COLOR_RED, COLOR_WHITE } from "@/constants/colors";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
+import { Ionicons } from "@expo/vector-icons";
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 
 export enum ButtonVariants {
   PRIMARY,
@@ -18,7 +25,8 @@ export enum ButtonSizes {
 interface ButtonProps {
   label: string;
   variant?: ButtonVariants;
-
+  icon?: string;
+  style?: ViewStyle;
   isLoading?: boolean;
   onPress?: () => void;
 }
@@ -50,16 +58,25 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     transform: [{ rotate: "360deg" }],
   },
-  createText: {
-    fontSize: 14,
-    color: "white",
+  iconAndTextWrapper: {
+    flexDirection: "row",
+    gap: SCREEN_WIDTH * 0.02,
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 
 const Spinner = () => <Text style={styles.spinner}>...</Text>;
 
 export default function Button(props: ButtonProps) {
-  const { label, variant = ButtonVariants.PRIMARY, isLoading, onPress } = props;
+  const {
+    label,
+    variant = ButtonVariants.PRIMARY,
+    icon,
+    style,
+    isLoading,
+    onPress,
+  } = props;
 
   return (
     <TouchableOpacity
@@ -68,6 +85,7 @@ export default function Button(props: ButtonProps) {
         variant === ButtonVariants.PRIMARY
           ? styles.primaryButton
           : styles.dangerButton,
+        style && { ...style },
       ]}
       onPress={onPress}
       disabled={isLoading}
@@ -75,15 +93,25 @@ export default function Button(props: ButtonProps) {
       {isLoading ? (
         <Spinner />
       ) : (
-        <Text
-          style={{
-            ...FONT_STYLES.LABEL_STYLE,
-            color: COLOR_WHITE,
-            textAlign: "center",
-          }}
-        >
-          {label}
-        </Text>
+        <View style={styles.iconAndTextWrapper}>
+          {/* workaround to bypass the humongous Ionicons type */}
+          {icon && (
+            <Ionicons
+              name={icon as any}
+              size={SCREEN_HEIGHT * 0.02}
+              color={COLOR_WHITE}
+            />
+          )}
+          <Text
+            style={{
+              ...FONT_STYLES.LABEL_STYLE,
+              color: COLOR_WHITE,
+              textAlign: "center",
+            }}
+          >
+            {label}
+          </Text>
+        </View>
       )}
     </TouchableOpacity>
   );

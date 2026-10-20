@@ -10,13 +10,12 @@
 import { MyTopHabits } from "@/components/per-screen/index/my-top-habits";
 import { ProgressBuddy } from "@/components/per-screen/index/progress-buddy";
 import { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
-import React from "react";
+import React, { useRef } from "react";
 import { StyleSheet } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 const IndexScreen = () => {
   // const [modalVisible, setModalVisible] = useState<boolean>(false);
-
   // const revokeVpnPermission = async () => {
   //   const vpnIsStopped = await VpnAppBlockerModule.stopVpn();
   //   if (!vpnIsStopped) return;
@@ -52,17 +51,21 @@ const IndexScreen = () => {
   //   const capsules = await readAllCapsules();
   //   VpnAppBlockerModule.startVpn(capsules);
   // };
+  const scrollViewRef = useRef<ScrollView>(null);
 
   return (
     <ScrollView
+      ref={scrollViewRef}
       style={styles.container}
-      showsHorizontalScrollIndicator={false}
+      showsVerticalScrollIndicator={false}
       snapToInterval={SCREEN_HEIGHT} // 👈 Tells ScrollView where to stop
       snapToAlignment="center"
       decelerationRate="fast"
+      scrollEnabled={false}
+      nestedScrollEnabled={false}
     >
-      <ProgressBuddy />
-      <MyTopHabits />
+      <ProgressBuddy scrollViewRef={scrollViewRef} />
+      <MyTopHabits scrollViewRef={scrollViewRef} />
     </ScrollView>
   );
 

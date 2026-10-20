@@ -6,18 +6,19 @@ import {
   GAP_BETWEEN_HABIT_CARDS,
   HABIT_CARD_HEIGHT,
   MOCK_CAPSULES,
-  PROGRESS_BUDDY_HINT,
   PROGRESS_BUDDY_PHRASE,
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
 
 import HorizontalSwiper from "@/components/HorizontalSwiper";
+import Button from "@/components/ui/button";
 import { Capsule } from "@/models/capsule";
+import { ToggleScrollViewProps } from "@/types/ToggleScrollViewProps";
 import React from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import HabitCard from "./HabitCard";
 
-export const ProgressBuddy = () => {
+export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
   return (
     <LinearGradientBackground
       colors={LINEAR_GRADIENT_2}
@@ -75,9 +76,17 @@ export const ProgressBuddy = () => {
             ]}
           />
         </View>
-        <Text style={[styles.hint, FONT_STYLES.H5_STYLE]}>
-          {PROGRESS_BUDDY_HINT}
-        </Text>
+        <Button
+          icon="happy-outline"
+          style={{ width: SCREEN_WIDTH * 0.45 }}
+          label="Weekly Highlights"
+          onPress={() =>
+            scrollViewRef?.current?.scrollTo({
+              y: SCREEN_HEIGHT,
+              animated: true,
+            })
+          }
+        />
       </View>
     </LinearGradientBackground>
   );
@@ -118,8 +127,10 @@ const styles = StyleSheet.create({
   hint: {
     color: COLOR_PRIMARY,
     opacity: 0.6,
-    flex: 1,
-    // This hint is only visible in Buddy Mode (handled by conditional rendering)
+    // flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    height: SCREEN_HEIGHT * 0.1,
   },
   horizontalScrollContainer: {
     flexDirection: "row", // Enables horizontal scrolling of cards

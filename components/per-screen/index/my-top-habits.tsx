@@ -1,3 +1,5 @@
+import Button from "@/components/ui/button";
+
 import {
   COLOR_BRONZE,
   COLOR_GOLD,
@@ -12,6 +14,7 @@ import {
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/capsule";
+import { ToggleScrollViewProps } from "@/types/ToggleScrollViewProps";
 import React from "react";
 import { ColorValue, Image, StyleSheet, Text, View } from "react-native";
 
@@ -85,7 +88,7 @@ const RemainingHabitItem = ({ capsule }: { capsule: Capsule }) => {
   );
 };
 
-export const MyTopHabits = () => {
+export const MyTopHabits = ({ scrollViewRef }: ToggleScrollViewProps) => {
   const sorted = sortCapsules(MOCK_CAPSULES);
   const top3 = sorted.slice(0, TOP_HABITS_COUNT);
   const remaining = sorted.slice(TOP_HABITS_COUNT, TOP_HABITS_COUNT + 2);
@@ -105,9 +108,14 @@ export const MyTopHabits = () => {
           <RemainingHabitItem key={capsule.id} capsule={capsule} />
         ))}
       </View>
-      <Text style={[styles.hint, FONT_STYLES.H5_STYLE]}>
-        Swipe Down to Return
-      </Text>
+      <Button
+        label="Home"
+        icon="home-outline"
+        style={{ width: SCREEN_WIDTH * 0.3 }}
+        onPress={() =>
+          scrollViewRef?.current?.scrollTo({ y: 0, animated: true })
+        }
+      />
     </View>
   );
 };
@@ -188,8 +196,5 @@ const styles = StyleSheet.create({
   },
   remainingCount: {
     color: COLOR_GREY,
-  },
-  hint: {
-    opacity: 0.6,
   },
 });
