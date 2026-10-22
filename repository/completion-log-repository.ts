@@ -16,13 +16,11 @@ interface CompletionLogRepository {
   ): Promise<CompletionLog[]>;
 }
 
-// Mock function to simulate getting a database instance (replace with actual logic)
-async function getDbInstance(): Promise<SQLite.SQLiteDatabase> {
-  // This should mirror the initialization pattern used in capsules-repository.ts
-  return SQLite.openDatabaseAsync("main_app_db", { useNewConnection: true });
-}
-
-export const completionLogRepository: CompletionLogRepository = {
+export default class CompletionLogRepositoryImpl implements CompletionLogRepository {
+  db: SQLite.SQLiteDatabase;
+  constructor(db: SQLite.SQLiteDatabase) {
+    this.db = db;
+  }
   /**
    * Implements the complex SQL JOIN to fetch logs within a defined week.
    * @param capsuleId The ID of the capsule (e.g., CS_00001).
@@ -34,8 +32,6 @@ export const completionLogRepository: CompletionLogRepository = {
     startDate: Date,
     endDate: Date,
   ): Promise<CompletionLog[]> {
-    const db = await getDbInstance();
-
     // SQL Query using JOIN to link logs and capsules based on the capsule ID.
     // We use SQLite's standard parameter binding (?) for security.
     const query = `
@@ -56,7 +52,7 @@ export const completionLogRepository: CompletionLogRepository = {
     console.log("[DAL] Executing SQL Query:", query);
 
     try {
-      const result = await db.getAllAsync<CompletionLog>(query, params);
+      const result = await this.db.getAllAsync<CompletionLog>(query, params);
       return result;
     } catch (e) {
       console.error("Error retrieving completion logs:", e);
@@ -65,5 +61,5 @@ export const completionLogRepository: CompletionLogRepository = {
         "Failed to retrieve completion logs due to a database error.",
       );
     }
-  },
-};
+  }
+}

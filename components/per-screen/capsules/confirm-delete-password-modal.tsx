@@ -1,8 +1,8 @@
 import { Modal } from "@/components/ui/modal";
 import { DELETE_CONFIRMATION_PASSWORD_KEY } from "@/constants/password";
 import { Capsule } from "@/models/capsule";
+import { deleteCapsule } from "@/repository/capsules-repository";
 import { getPassword, hashPassword } from "@/utils/expo/crypto/password-utils";
-import { deleteCapsule } from "@/utils/expo/sqlite/capsules-repository";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -35,7 +35,7 @@ export const ConfirmDeletePasswordModal = ({
     onCancel();
   };
 
-  const handleDelete = async (id: number | undefined) => {
+  const handleDelete = async (id: string | undefined) => {
     try {
       if (!id) return;
 

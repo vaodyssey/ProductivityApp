@@ -7,9 +7,12 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 
+import { DATABASE_NAME } from "@/constants/database";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { store } from "@/redux/store";
+import { initDatabaseIfApplicable } from "@/repository/init-database";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { SQLiteProvider } from "expo-sqlite";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -38,14 +41,22 @@ export default function RootLayout() {
         <SafeAreaProvider>
           <GestureHandlerRootView style={styles.container}>
             <BottomSheetModalProvider>
-              <Stack>
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="create-capsule/index"
-                  options={{ title: "Create Capsule" }}
-                />
-              </Stack>
+              <SQLiteProvider
+                databaseName={DATABASE_NAME}
+                onInit={initDatabaseIfApplicable}
+              >
+                <Stack>
+                  <Stack.Screen name="index" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
+                  <Stack.Screen
+                    name="create-capsule/index"
+                    options={{ title: "Create Capsule" }}
+                  />
+                </Stack>
+              </SQLiteProvider>
               <StatusBar style="auto" />
             </BottomSheetModalProvider>
           </GestureHandlerRootView>

@@ -1,5 +1,5 @@
 import { Capsule } from "@/models/capsule";
-import { readCapsuleById } from "@/utils/expo/sqlite/capsules-repository";
+import { readCapsuleById } from "@/repository/capsules-repository";
 import { parseNumberFromString } from "@/utils/number";
 import { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";

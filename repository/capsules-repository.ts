@@ -1,33 +1,9 @@
-import { CAPSULE_TABLE_NAME, DATABASE_NAME } from "@/constants/database";
+import { DATABASE_NAME } from "@/constants/database";
 import { Capsule } from "@/models/capsule";
 import * as SQLite from "expo-sqlite";
 
 // Global DB Instance (Optional, initialized at startup)
 let dbInstance: SQLite.SQLiteDatabase | null = null;
-
-/**
- * Initialize the database connection (call this once at app startup).
- */
-export async function initDatabase(): Promise<SQLite.SQLiteDatabase> {
-  const db = await SQLite.openDatabaseAsync(DATABASE_NAME, {
-    useNewConnection: true,
-  });
-
-  // Enable Write-Ahead Logging for better concurrency
-  await db.execAsync(`PRAGMA journal_mode = WAL;`);
-
-  // Create the table schema specifically for the Capsule entity
-  await db.execAsync(`
-    CREATE TABLE IF NOT EXISTS ${CAPSULE_TABLE_NAME} (
-      id INTEGER PRIMARY KEY AUTOINCREMENT, 
-      badHabitName TEXT NOT NULL, 
-      appPackageName TEXT NOT NULL, 
-      imageUrl TEXT NOT NULL
-    );
-  `);
-
-  return db;
-}
 
 /**
  * CRUD - Create: Inserts a new Capsule entity.
@@ -39,17 +15,17 @@ export async function createCapsule(
   const targetDb = db || (await ensureOpenDatabase());
 
   const lastId = await targetDb.runAsync(
-    "INSERT INTO capsules (badHabitName, appPackageName, imageUrl) VALUES (?, ?, ?)",
-    capsule.badHabitName,
-    capsule.appPackageName,
-    capsule.imageUrl,
+    "INSERT INTO capsules (goodHabitName, badAppPackageName, goodImageUrl) VALUES (?, ?, ?)",
+    capsule.goodHabitName,
+    capsule.badAppPackageName,
+    capsule.goodImageUrl,
   );
 
   return lastId.lastInsertRowId as number;
 }
 
 /**
- * CRUD - Read Single: Retrieves a single Capsule by badHabitName.
+ * CRUD - Read Single: Retrieves a single Capsule by goodHabitName.
  */
 export async function readCapsuleById(
   id: number,
@@ -58,7 +34,7 @@ export async function readCapsuleById(
   const targetDb = db || (await ensureOpenDatabase());
 
   const query =
-    "SELECT id, badHabitName, appPackageName, imageUrl FROM capsules WHERE id = ?";
+    "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules WHERE id = ?";
 
   const result = await targetDb.getFirstAsync<Capsule>(query, id);
   return result;
@@ -73,7 +49,7 @@ export async function readAllCapsules(
   const targetDb = db || (await ensureOpenDatabase());
 
   const query =
-    "SELECT id, badHabitName, appPackageName, imageUrl FROM capsules ORDER BY id ASC";
+    "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules ORDER BY id ASC";
 
   const res = await targetDb.getAllAsync<Capsule>(query);
   return res;
@@ -99,20 +75,6 @@ async function ensureOpenDatabase(): Promise<SQLite.SQLiteDatabase> {
     const initialDb = await SQLite.openDatabaseAsync(DATABASE_NAME, {
       useNewConnection: true,
     });
-    // Re-run schema creation just in case, though init() usually handles it
-    try {
-      await initialDb.execAsync(`PRAGMA journal_mode = WAL;`);
-      await initialDb.execAsync(`
-          CREATE TABLE IF NOT EXISTS capsules (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            badHabitName TEXT NOT NULL, 
-            appPackageName TEXT NOT NULL, 
-            imageUrl TEXT NOT NULL
-          );
-        `);
-    } catch (e) {
-      // Schema already exists, ignore error
-    }
     dbInstance = initialDb;
   }
   return dbInstance;
@@ -125,10 +87,10 @@ export async function updateCapsule(
   const targetDb = db || (await ensureOpenDatabase());
   if (!capsule.id) return 0;
   const result = await targetDb.runAsync(
-    "UPDATE capsules SET badHabitName = ?, appPackageName = ?, imageUrl = ? WHERE id = ?",
-    capsule.badHabitName,
-    capsule.appPackageName,
-    capsule.imageUrl,
+    "UPDATE capsules SET goodHabitName = ?, badAppPackageName = ?, goodImageUrl = ? WHERE id = ?",
+    capsule.goodHabitName,
+    capsule.badAppPackageName,
+    capsule.goodImageUrl,
     capsule.id,
   );
   return result.changes;
