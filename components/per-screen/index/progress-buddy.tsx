@@ -13,12 +13,15 @@ import FONT_STYLES from "@/constants/text";
 import HorizontalSwiper from "@/components/HorizontalSwiper";
 import Button from "@/components/ui/button";
 import { Capsule } from "@/models/capsule";
-import { ToggleScrollViewProps } from "@/types/ToggleScrollViewProps";
+import { ToggleScrollViewProps } from "@/types/toggle-scroll-view-props";
+
+import { useMascotMood } from "@/hooks/per-screen/index/use-mascot-mood";
 import React from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import HabitCard from "./HabitCard";
 
 export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
+  const { isLoading, moodStatus } = useMascotMood();
   return (
     <LinearGradientBackground
       colors={LINEAR_GRADIENT_2}

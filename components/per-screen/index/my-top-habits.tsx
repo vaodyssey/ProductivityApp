@@ -14,7 +14,7 @@ import {
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/capsule";
-import { ToggleScrollViewProps } from "@/types/ToggleScrollViewProps";
+import { ToggleScrollViewProps } from "@/types/toggle-scroll-view-props";
 import React from "react";
 import { ColorValue, Image, StyleSheet, Text, View } from "react-native";
 
