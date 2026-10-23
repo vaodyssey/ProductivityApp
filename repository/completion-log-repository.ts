@@ -1,7 +1,7 @@
 import { CompletionLog } from "@/models/completion-log";
 import * as SQLite from "expo-sqlite";
 
-interface CompletionLogRepository {
+interface ICompletionLogRepository {
   /**
    * Retrieves all completion logs for a given capsule within a specified date range (a week).
    * @param capsuleId The ID of the capsule.
@@ -16,8 +16,8 @@ interface CompletionLogRepository {
   ): Promise<CompletionLog[]>;
 }
 
-export default class CompletionLogRepositoryImpl implements CompletionLogRepository {
-  db: SQLite.SQLiteDatabase;
+export default class CompletionLogRepository implements ICompletionLogRepository {
+  private db: SQLite.SQLiteDatabase;
   constructor(db: SQLite.SQLiteDatabase) {
     this.db = db;
   }

@@ -15,12 +15,28 @@ import Button from "@/components/ui/button";
 import { Capsule } from "@/models/capsule";
 import { ToggleScrollViewProps } from "@/types/toggle-scroll-view-props";
 
-import React from "react";
+import CompletionLogRepository from "@/repository/completion-log-repository";
+import { useSQLiteContext } from "expo-sqlite";
+import React, { useEffect } from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import HabitCard from "./HabitCard";
 
 export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
   // const { isLoading, moodStatus } = useMascotMood();
+  const db = useSQLiteContext();
+  const completionLogRepository = new CompletionLogRepository(db);
+  const msToAdd = 2 * 60 * 60 * 1000 + 30 * 60 * 1000;
+  const getDbRows = async () => {
+    const res = await completionLogRepository.getLogsForWeek(
+      "CS_00001",
+      new Date(),
+      new Date(new Date().getTime() + msToAdd),
+    );
+    console.log(`current rows in table: ${res}`);
+  };
+  useEffect(() => {
+    getDbRows();
+  }, []);
   return (
     <LinearGradientBackground
       colors={LINEAR_GRADIENT_2}

@@ -6,11 +6,8 @@ import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import { CapsuleFormMode } from "@/constants/per-screen/create-capsule/constants";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/capsule";
-import {
-  createCapsule,
-  initDatabase,
-  updateCapsule,
-} from "@/utils/expo/sqlite/capsules-repository";
+import CapsulesRepository from "@/repository/capsules-repository";
+import { useSQLiteContext } from "expo-sqlite";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { useRouter } from "expo-router";
 import React, { useRef, useState } from "react";
@@ -24,14 +21,15 @@ const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
   const ref = useRef<BottomSheet>(null);
   const { getValues, handleSubmit } = useFormContext<Capsule>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const db = useSQLiteContext();
+  const capsulesRepository = new CapsulesRepository(db);
   const router = useRouter();
   const onSubmit = async () => {
     try {
       setIsSubmitting(true);
-      const db = await initDatabase();
       const capsule = getValues();
-      if (capsule.id) await updateCapsule(capsule);
-      else await createCapsule(capsule, db);
+      if (capsule.id) await capsulesRepository.update(capsule);
+      else await capsulesRepository.create(capsule);
       router.navigate("/(tabs)/capsules");
     } catch (error) {
       console.error(error);

@@ -1,7 +1,8 @@
 import { Modal } from "@/components/ui/modal";
 import { DELETE_CONFIRMATION_PASSWORD_KEY } from "@/constants/password";
 import { Capsule } from "@/models/capsule";
-import { deleteCapsule } from "@/repository/capsules-repository";
+import CapsulesRepository from "@/repository/capsules-repository";
+import { useSQLiteContext } from "expo-sqlite";
 import { getPassword, hashPassword } from "@/utils/expo/crypto/password-utils";
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, View } from "react-native";
@@ -19,6 +20,8 @@ export const ConfirmDeletePasswordModal = ({
   setModalVisible,
   onPressDelete,
 }: ConfirmDeletePasswordModalProps) => {
+  const db = useSQLiteContext();
+  const capsulesRepository = new CapsulesRepository(db);
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -43,7 +46,8 @@ export const ConfirmDeletePasswordModal = ({
         console.log(`Deleting capsule with ID: ${id}`);
       }
 
-      await deleteCapsule(id);
+      const idNumber = parseInt(id, 10);
+      await capsulesRepository.delete(idNumber);
       onPressDelete && onPressDelete();
     } catch (error) {
       console.error("Failed to delete capsule:", error);

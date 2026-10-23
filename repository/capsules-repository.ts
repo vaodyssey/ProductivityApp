@@ -2,96 +2,77 @@ import { DATABASE_NAME } from "@/constants/database";
 import { Capsule } from "@/models/capsule";
 import * as SQLite from "expo-sqlite";
 
-// Global DB Instance (Optional, initialized at startup)
-let dbInstance: SQLite.SQLiteDatabase | null = null;
-
-/**
- * CRUD - Create: Inserts a new Capsule entity.
- */
-export async function createCapsule(
-  capsule: Capsule,
-  db?: SQLite.SQLiteDatabase,
-): Promise<number> {
-  const targetDb = db || (await ensureOpenDatabase());
-
-  const lastId = await targetDb.runAsync(
-    "INSERT INTO capsules (goodHabitName, badAppPackageName, goodImageUrl) VALUES (?, ?, ?)",
-    capsule.goodHabitName,
-    capsule.badAppPackageName,
-    capsule.goodImageUrl,
-  );
-
-  return lastId.lastInsertRowId as number;
+interface ICapsulesRepository {
+  create(capsule: Capsule): Promise<number>;
+  readById(id: number): Promise<Capsule | null>;
+  readAll(): Promise<Capsule[]>;
+  update(capsule: Capsule): Promise<number>;
+  delete(id: number): Promise<void>;
 }
 
-/**
- * CRUD - Read Single: Retrieves a single Capsule by goodHabitName.
- */
-export async function readCapsuleById(
-  id: number,
-  db?: SQLite.SQLiteDatabase,
-): Promise<Capsule | null> {
-  const targetDb = db || (await ensureOpenDatabase());
-
-  const query =
-    "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules WHERE id = ?";
-
-  const result = await targetDb.getFirstAsync<Capsule>(query, id);
-  return result;
-}
-
-/**
- * CRUD - Read All: Retrieves all Capsules.
- */
-export async function readAllCapsules(
-  db?: SQLite.SQLiteDatabase,
-): Promise<Capsule[]> {
-  const targetDb = db || (await ensureOpenDatabase());
-
-  const query =
-    "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules ORDER BY id ASC";
-
-  const res = await targetDb.getAllAsync<Capsule>(query);
-  return res;
-}
-
-/**
- * CRUD - Delete: Removes a Capsule by ID.
- */
-export async function deleteCapsule(
-  id: number,
-  db?: SQLite.SQLiteDatabase,
-): Promise<void> {
-  const targetDb = db || (await ensureOpenDatabase());
-
-  await targetDb.runAsync("DELETE FROM capsules WHERE id = ?", id);
-}
-
-/**
- * Helper to ensure the database is open.
- */
-async function ensureOpenDatabase(): Promise<SQLite.SQLiteDatabase> {
-  if (!dbInstance) {
-    const initialDb = await SQLite.openDatabaseAsync(DATABASE_NAME, {
-      useNewConnection: true,
-    });
-    dbInstance = initialDb;
+export default class CapsulesRepository implements ICapsulesRepository {
+  private db: SQLite.SQLiteDatabase;
+  constructor(db: SQLite.SQLiteDatabase) {
+    this.db = db;
   }
-  return dbInstance;
-}
-
-export async function updateCapsule(
-  capsule: Capsule,
-  db?: SQLite.SQLiteDatabase,
-): Promise<number> {
-  const targetDb = db || (await ensureOpenDatabase());
-  if (!capsule.id) return 0;
-  const result = await targetDb.runAsync(
-    "UPDATE capsules SET goodHabitName = ?, badAppPackageName = ?, goodImageUrl = ? WHERE id = ?",
-    capsule.goodHabitName,
-    capsule.badAppPackageName,
-    capsule.goodImageUrl,
-    capsule.id,
-  );
-  return result.changes;
+  async create(capsule: Capsule): Promise<number> {
+    try {
+      const lastId = await this.db.runAsync(
+        "INSERT INTO capsules (goodHabitName, badAppPackageName, goodImageUrl) VALUES (?, ?, ?)",
+        capsule.goodHabitName,
+        capsule.badAppPackageName,
+        capsule.goodImageUrl,
+      );
+      return lastId.lastInsertRowId as number;
+    } catch (e) {
+      console.error("Error creating capsule:", e);
+      throw new Error("Failed to create capsule due to a database error.");
+    }
+  }
+  async readById(id: number): Promise<Capsule | null> {
+    try {
+      const query =
+        "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules WHERE id = ?";
+      const result = await this.db.getFirstAsync<Capsule>(query, id);
+      return result;
+    } catch (e) {
+      console.error("Error reading capsule:", e);
+      throw new Error("Failed to read capsule due to a database error.");
+    }
+  }
+  async readAll(): Promise<Capsule[]> {
+    try {
+      const query =
+        "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules ORDER BY id ASC";
+      const res = await this.db.getAllAsync<Capsule>(query);
+      return res;
+    } catch (e) {
+      console.error("Error reading all capsules:", e);
+      throw new Error("Failed to read capsules due to a database error.");
+    }
+  }
+  async delete(id: number): Promise<void> {
+    try {
+      await this.db.runAsync("DELETE FROM capsules WHERE id = ?", id);
+    } catch (e) {
+      console.error("Error deleting capsule:", e);
+      throw new Error("Failed to delete capsule due to a database error.");
+    }
+  }
+  async update(capsule: Capsule): Promise<number> {
+    try {
+      if (!capsule.id) return 0;
+      const result = await this.db.runAsync(
+        "UPDATE capsules SET goodHabitName = ?, badAppPackageName = ?, goodImageUrl = ? WHERE id = ?",
+        capsule.goodHabitName,
+        capsule.badAppPackageName,
+        capsule.goodImageUrl,
+        capsule.id,
+      );
+      return result.changes;
+    } catch (e) {
+      console.error("Error updating capsule:", e);
+      throw new Error("Failed to update capsule due to a database error.");
+    }
+  }
 }
