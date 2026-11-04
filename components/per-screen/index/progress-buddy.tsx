@@ -5,38 +5,34 @@ import {
   FLATLIST_SNAP_INTERVAL,
   GAP_BETWEEN_HABIT_CARDS,
   HABIT_CARD_HEIGHT,
-  MOCK_CAPSULES,
   PROGRESS_BUDDY_PHRASE,
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
 
 import HorizontalSwiper from "@/components/HorizontalSwiper";
 import Button from "@/components/ui/button";
-import { Capsule } from "@/models/capsule";
-import { ToggleScrollViewProps } from "@/types/toggle-scroll-view-props";
-
+import { useCompletionLogs } from "@/hooks/per-screen/index/use-completion-logs";
+import { CompletionLogWithImage } from "@/models/completion-log";
+import CapsuleRepository from "@/repository/capsule-repository";
 import CompletionLogRepository from "@/repository/completion-log-repository";
+import { ToggleScrollViewProps } from "@/types/toggle-scroll-view-props";
+import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
-import React, { useEffect } from "react";
+import React from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
 import HabitCard from "./HabitCard";
 
 export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
   // const { isLoading, moodStatus } = useMascotMood();
+  const router = useRouter();
   const db = useSQLiteContext();
   const completionLogRepository = new CompletionLogRepository(db);
-  const msToAdd = 2 * 60 * 60 * 1000 + 30 * 60 * 1000;
-  const getDbRows = async () => {
-    const res = await completionLogRepository.getLogsForWeek(
-      "CS_00001",
-      new Date(),
-      new Date(new Date().getTime() + msToAdd),
-    );
-    console.log(`current rows in table: ${res}`);
-  };
-  useEffect(() => {
-    getDbRows();
-  }, []);
+  const capsuleRepository = new CapsuleRepository(db);
+
+  const { todayCompletionLogs, weeklyCompletionLogs } = useCompletionLogs({
+    capsuleRepository,
+    completionLogRepository,
+  });
   return (
     <LinearGradientBackground
       colors={LINEAR_GRADIENT_2}
@@ -48,62 +44,75 @@ export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
           {PROGRESS_BUDDY_PHRASE}
         </Text>
         <View style={{ flex: 10 }}>
-          <HorizontalSwiper
-            style={styles.habitCardsScrollView}
-            pages={[
-              {
-                key: "mascot",
-                component: (
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      width: SCREEN_WIDTH * 0.8,
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Image
-                      source={require("../../../assets/images/mascot.png")}
-                      style={styles.mascot}
-                    />
-                  </View>
-                ),
-              },
-              {
-                key: "todo-list",
-                component: (
-                  <View>
-                    <FlatList
-                      data={MOCK_CAPSULES}
-                      style={{ height: HABIT_CARD_HEIGHT, borderRadius: 12 }}
-                      contentContainerStyle={{ gap: GAP_BETWEEN_HABIT_CARDS }}
-                      nestedScrollEnabled
-                      snapToInterval={FLATLIST_SNAP_INTERVAL} // Distance between snapping stops
-                      snapToAlignment="center" // Aligns snapped item to "start", "center", or "end"
-                      decelerationRate="fast"
-                      renderItem={(listRenderItem) => (
-                        <HabitCard
-                          key={listRenderItem.item.id}
-                          capsule={listRenderItem.item}
-                        />
-                      )}
-                      keyExtractor={(capsule: Capsule) => capsule.id} // Provides a unique key for tracking elements
-                    />
-                  </View>
-                ),
-              },
-            ]}
-          />
+          {!todayCompletionLogs || todayCompletionLogs.length <= 0 ? (
+            <View>
+              <Text>No capsules found - please create one!</Text>
+              <Button
+                style={{ width: SCREEN_WIDTH * 0.45 }}
+                label="Create Capsule"
+                onPress={() => router.navigate("/create-capsule")}
+              />
+            </View>
+          ) : (
+            <HorizontalSwiper
+              style={styles.habitCardsScrollView}
+              pages={[
+                {
+                  key: "mascot",
+                  component: (
+                    <View
+                      style={{
+                        justifyContent: "center",
+                        width: SCREEN_WIDTH * 0.8,
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Image
+                        source={require("../../../assets/images/mascot.gif")}
+                        style={styles.mascot}
+                      />
+                    </View>
+                  ),
+                },
+                {
+                  key: "todo-list",
+                  component: (
+                    <View>
+                      <FlatList
+                        data={todayCompletionLogs}
+                        style={{ height: HABIT_CARD_HEIGHT, borderRadius: 12 }}
+                        contentContainerStyle={{ gap: GAP_BETWEEN_HABIT_CARDS }}
+                        nestedScrollEnabled
+                        snapToInterval={FLATLIST_SNAP_INTERVAL} // Distance between snapping stops
+                        snapToAlignment="center" // Aligns snapped item to "start", "center", or "end"
+                        decelerationRate="fast"
+                        renderItem={(listRenderItem) => (
+                          <HabitCard
+                            key={listRenderItem.item.id}
+                            completionLog={listRenderItem.item}
+                          />
+                        )}
+                        keyExtractor={(completionLog: CompletionLogWithImage) =>
+                          completionLog.id
+                        } // Provides a unique key for tracking elements
+                      />
+                    </View>
+                  ),
+                },
+              ]}
+            />
+          )}
         </View>
         <Button
           icon="happy-outline"
           style={{ width: SCREEN_WIDTH * 0.45 }}
           label="Weekly Highlights"
-          onPress={() =>
+          onPress={() => {
             scrollViewRef?.current?.scrollTo({
               y: SCREEN_HEIGHT,
               animated: true,
-            })
-          }
+            });
+          }}
         />
       </View>
     </LinearGradientBackground>

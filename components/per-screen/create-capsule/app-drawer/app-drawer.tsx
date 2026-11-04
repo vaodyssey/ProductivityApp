@@ -26,7 +26,7 @@ interface AppListProps {
 const AppList: React.FC<AppListProps> = ({ apps, ref }) => {
   const methods = useFormContext<Capsule>();
   const onToggle = (packageName: string) => {
-    methods.setValue("appPackageName", packageName);
+    methods.setValue("badAppPackageName", packageName);
     ref?.current?.close();
   };
 

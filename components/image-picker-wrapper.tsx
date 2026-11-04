@@ -54,7 +54,7 @@ export default function ImagePickerWrapper({
       name={imageHookFormPath}
       render={({ field: { value } }) => (
         <View style={styles.container}>
-          <Image source={{ uri: value ?? "" }} style={styles.image} />
+          {value && <Image source={{ uri: value }} style={styles.image} />}
           <Button label={buttonLabel} onPress={pickImage} />
         </View>
       )}

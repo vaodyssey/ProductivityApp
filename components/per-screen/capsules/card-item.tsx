@@ -20,7 +20,7 @@ export const CardItem: React.FC<CardItemProps> = ({
 }) => {
   const router = useRouter();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const updateCapsule = (id: number | undefined) => {
+  const updateCapsule = (id: string | undefined) => {
     router.navigate({ pathname: "/create-capsule", params: { id } });
   };
 
@@ -28,14 +28,14 @@ export const CardItem: React.FC<CardItemProps> = ({
     <View style={styles.container}>
       <View onTouchStart={() => updateCapsule(capsule.id)}>
         <Text style={[styles.badHabitName, FONT_STYLES.H4_STYLE]}>
-          {capsule.badHabitName || "No Habit Name"}
+          {capsule.goodHabitName || "No Habit Name"}
         </Text>
         <Text
           style={[styles.packageName, FONT_STYLES.CAPTION_STYLE]}
           numberOfLines={1} // Prevents text from breaking layout
           ellipsizeMode="tail" // Adds "..." if too long
         >
-          {capsule.appPackageName}
+          {capsule.badAppPackageName}
         </Text>
       </View>
 

@@ -24,7 +24,8 @@ export async function initDatabaseIfApplicable(db: SQLite.SQLiteDatabase) {
       id STRING PRIMARY KEY, 
       dateTime TEXT NOT NULL, 
       completed TEXT NOT NULL, 
-      capsuleId TEXT NOT NULL
+      capsuleId STRING,
+      FOREIGN KEY (capsuleId) REFERENCES ${CAPSULES_TABLE_NAME} (id)
     );
   `);
 }

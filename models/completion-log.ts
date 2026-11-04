@@ -4,3 +4,12 @@ export interface CompletionLog {
   completed: boolean;
   capsuleId: string;
 }
+
+export interface CompletionLogWithImage {
+  id: string;
+  dateTime: string;
+  completed: number | boolean;
+  goodHabitName: string;
+  goodImageUrl: string;
+  opacity: number;
+}

@@ -1,16 +1,16 @@
-import { DATABASE_NAME } from "@/constants/database";
+import { CAPSULE_ID_PREFIX, CAPSULES_TABLE_NAME } from "@/constants/database";
 import { Capsule } from "@/models/capsule";
 import * as SQLite from "expo-sqlite";
 
-interface ICapsulesRepository {
+interface ICapsuleRepository {
   create(capsule: Capsule): Promise<number>;
-  readById(id: number): Promise<Capsule | null>;
-  readAll(): Promise<Capsule[]>;
+  getById(id: number): Promise<Capsule | null>;
+  getAll(): Promise<Capsule[]>;
   update(capsule: Capsule): Promise<number>;
   delete(id: number): Promise<void>;
 }
 
-export default class CapsulesRepository implements ICapsulesRepository {
+export default class CapsuleRepository implements ICapsuleRepository {
   private db: SQLite.SQLiteDatabase;
   constructor(db: SQLite.SQLiteDatabase) {
     this.db = db;
@@ -18,7 +18,8 @@ export default class CapsulesRepository implements ICapsulesRepository {
   async create(capsule: Capsule): Promise<number> {
     try {
       const lastId = await this.db.runAsync(
-        "INSERT INTO capsules (goodHabitName, badAppPackageName, goodImageUrl) VALUES (?, ?, ?)",
+        "INSERT INTO capsules (id, goodHabitName, badAppPackageName, goodImageUrl) VALUES (?, ?, ?, ?)",
+        capsule.id,
         capsule.goodHabitName,
         capsule.badAppPackageName,
         capsule.goodImageUrl,
@@ -29,7 +30,7 @@ export default class CapsulesRepository implements ICapsulesRepository {
       throw new Error("Failed to create capsule due to a database error.");
     }
   }
-  async readById(id: number): Promise<Capsule | null> {
+  async getById(id: number): Promise<Capsule | null> {
     try {
       const query =
         "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules WHERE id = ?";
@@ -40,7 +41,7 @@ export default class CapsulesRepository implements ICapsulesRepository {
       throw new Error("Failed to read capsule due to a database error.");
     }
   }
-  async readAll(): Promise<Capsule[]> {
+  async getAll(): Promise<Capsule[]> {
     try {
       const query =
         "SELECT id, goodHabitName, badAppPackageName, goodImageUrl FROM capsules ORDER BY id ASC";
@@ -73,6 +74,29 @@ export default class CapsulesRepository implements ICapsulesRepository {
     } catch (e) {
       console.error("Error updating capsule:", e);
       throw new Error("Failed to update capsule due to a database error.");
+    }
+  }
+  async getLatestId(): Promise<string> {
+    const DEFAULT_ID = `${CAPSULE_ID_PREFIX}_0001`;
+
+    const query = `
+        SELECT MAX(id) AS latestId
+        FROM ${CAPSULES_TABLE_NAME};
+      `;
+
+    console.log("[DAL] Executing SQL Query:", query);
+
+    try {
+      // MAX() on an empty table returns one row with latestId = null
+      const row = await this.db.getFirstAsync<{ latestId: string | null }>(
+        query,
+      );
+      return row?.latestId ?? DEFAULT_ID;
+    } catch (e) {
+      console.error("Error retrieving latest completion log id:", e);
+      throw new Error(
+        "Failed to retrieve latest completion log id due to a database error.",
+      );
     }
   }
 }

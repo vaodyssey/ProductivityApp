@@ -5,17 +5,17 @@ import {
   HABIT_CARD_WIDTH,
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
-import { Capsule } from "@/models/capsule";
+import { CompletionLogWithImage } from "@/models/completion-log";
 import { SCREEN_WIDTH } from "@gorhom/bottom-sheet";
 import React from "react";
 import { Image, StyleSheet, Text, TextStyle, View } from "react-native";
 
 interface HabitCardProps {
-  capsule: Capsule;
+  completionLog: CompletionLogWithImage;
 }
 
-const BackgroundOverlay = ({ capsule }: HabitCardProps) => {
-  const opacity = Math.min(1, capsule.completedThisWeek / capsule.weeklyGoal);
+const BackgroundOverlay = ({ completionLog }: HabitCardProps) => {
+  const opacity = completionLog.opacity;
   const habitSubInfo: TextStyle = {
     color: opacity < 0.7 ? COLOR_WHITE : COLOR_BLACK_1, //TODO: Enhance image background color detection here
   };
@@ -23,35 +23,35 @@ const BackgroundOverlay = ({ capsule }: HabitCardProps) => {
     <View
       style={[
         styles.backgroundOverlay,
-        { backgroundColor: `rgba(0, 0, 0, ${1 - opacity})` }, // Darker overlay for lower completion
-        // We will use a placeholder image here in the final version
+        { backgroundColor: `rgba(0, 0, 0, ${1 - opacity})` },
       ]}
     >
       <View style={styles.habitInfo}>
         <Text style={[habitSubInfo, FONT_STYLES.H3_STYLE]}>
-          {capsule.badHabitName}
+          {completionLog.goodHabitName}
         </Text>
-        <Text style={[habitSubInfo, FONT_STYLES.H5_STYLE]}>Oct 20, 2026</Text>
+        <Text style={[habitSubInfo, FONT_STYLES.H5_STYLE]}>
+          {completionLog.dateTime}
+        </Text>
       </View>
-      <Button
-        icon="checkmark-circle-outline"
-        label={
-          capsule.completedThisWeek >= capsule.weeklyGoal
-            ? "Completed"
-            : "Complete"
-        }
-      />
+      <Button icon="checkmark-circle-outline" label={"Complete"} />
     </View>
   );
 };
 
-const HabitCard: React.FC<HabitCardProps> = ({ capsule }) => {
+const HabitCard: React.FC<HabitCardProps> = ({ completionLog }) => {
   // Calculate opacity based on performance (assuming weeklyGoal is available)
   // Opacity should be clamped between 0 and 1.
   return (
     <View style={styles.cardContainer}>
-      <Image source={require("../../../assets/images/mascot.png")} />
-      <BackgroundOverlay capsule={capsule} />
+      <Image
+        source={{
+          uri:
+            completionLog.goodImageUrl ?? "../../../assets/images/mascot.png",
+        }}
+        style={styles.imageStyle}
+      />
+      <BackgroundOverlay completionLog={completionLog} />
     </View>
   );
 };
@@ -83,6 +83,10 @@ const styles = StyleSheet.create({
   habitInfo: {
     flex: 1,
     flexDirection: "column",
+  },
+  imageStyle: {
+    width: "100%",
+    height: "100%",
   },
 });
 

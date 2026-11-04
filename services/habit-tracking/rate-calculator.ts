@@ -1,4 +1,4 @@
-import { completionLogRepository } from "@/repository/completion-log-repository";
+import CompletionLogRepository from "@/repository/completion-log-repository";
 import { AverageRateCalculationResult } from "@/types/rate-calculator";
 
 /**
@@ -30,7 +30,7 @@ export async function calculateAverageCompletionRate(
 
   for (const capsuleId of activeCapsuleIds) {
     // Phase 1: Data Retrieval - Use the dedicated DAL
-    const completionLogs = await completionLogRepository.getLogsForWeek(
+    const completionLogs = await CompletionLogRepository.getByDateRange(
       capsuleId,
       startDate,
       endDate,

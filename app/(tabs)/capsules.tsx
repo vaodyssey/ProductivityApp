@@ -5,7 +5,7 @@ import Spinner from "@/components/ui/spinner";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/capsule";
-import CapsulesRepository from "@/repository/capsules-repository";
+import CapsuleRepository from "@/repository/capsule-repository";
 import { usePathname, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useState } from "react";
@@ -14,13 +14,13 @@ import { CardItem } from "../../components/per-screen/capsules/card-item";
 const CapsulesScreen = () => {
   const router = useRouter();
   const db = useSQLiteContext();
-  const capsulesRepository = new CapsulesRepository(db);
+  const capsuleRepository = new CapsuleRepository(db);
   const [loading, setLoading] = useState<boolean>(true);
   const [capsules, setCapsules] = useState<Capsule[]>([]);
   const pathname = usePathname();
 
   const loadAllCapsules = async () => {
-    const capsules = await capsulesRepository.readAll();
+    const capsules = await capsuleRepository.getAll();
     setCapsules([...capsules]);
     setLoading(false);
   };
