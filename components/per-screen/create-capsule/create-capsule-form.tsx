@@ -5,6 +5,7 @@ import TextInput from "@/components/ui/text-input";
 import WeekdayPicker from "@/components/weekday-picker";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
 import { CapsuleFormMode } from "@/constants/per-screen/create-capsule/constants";
+import { HOME_ROUTE } from "@/constants/routes";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/capsule";
 import CapsuleRepository from "@/repository/capsule-repository";
@@ -41,9 +42,7 @@ const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
         selectedDays,
       });
 
-      // if (capsule.id) await capsuleRepository.update(capsule);
-      // else await capsuleRepository.create(capsule);
-      // router.navigate("/(tabs)/capsules");
+      router.navigate(HOME_ROUTE);
     } catch (error) {
       console.error(error);
     } finally {

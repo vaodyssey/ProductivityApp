@@ -1,4 +1,4 @@
-import { CAPSULE_ID_PREFIX, CAPSULES_TABLE_NAME } from "@/constants/database";
+import { CAPSULES_TABLE_NAME } from "@/constants/database";
 import { Capsule } from "@/models/capsule";
 import * as SQLite from "expo-sqlite";
 
@@ -77,8 +77,6 @@ export default class CapsuleRepository implements ICapsuleRepository {
     }
   }
   async getLatestId(): Promise<string> {
-    const DEFAULT_ID = `${CAPSULE_ID_PREFIX}_0001`;
-
     const query = `
         SELECT MAX(id) AS latestId
         FROM ${CAPSULES_TABLE_NAME};
@@ -91,7 +89,7 @@ export default class CapsuleRepository implements ICapsuleRepository {
       const row = await this.db.getFirstAsync<{ latestId: string | null }>(
         query,
       );
-      return row?.latestId ?? DEFAULT_ID;
+      return row?.latestId ?? "";
     } catch (e) {
       console.error("Error retrieving latest completion log id:", e);
       throw new Error(

@@ -11,6 +11,7 @@ import FONT_STYLES from "@/constants/text";
 
 import HorizontalSwiper from "@/components/HorizontalSwiper";
 import Button from "@/components/ui/button";
+import { useCompleteCompletionLogs } from "@/hooks/per-screen/index/use-complete-completion-logs";
 import { useCompletionLogs } from "@/hooks/per-screen/index/use-completion-logs";
 import { CompletionLogWithImage } from "@/models/completion-log";
 import CapsuleRepository from "@/repository/capsule-repository";
@@ -29,10 +30,17 @@ export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
   const completionLogRepository = new CompletionLogRepository(db);
   const capsuleRepository = new CapsuleRepository(db);
 
-  const { todayCompletionLogs, weeklyCompletionLogs } = useCompletionLogs({
+  const { dailyCompletionLogs, weeklyCompletionLogs } = useCompletionLogs({
     capsuleRepository,
     completionLogRepository,
   });
+
+  const { stagingCompletionLogs, toggleCompletion } = useCompleteCompletionLogs(
+    {
+      completionLogRepository,
+      dailyCompletionLogs,
+    },
+  );
   return (
     <LinearGradientBackground
       colors={LINEAR_GRADIENT_2}
@@ -44,42 +52,43 @@ export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
           {PROGRESS_BUDDY_PHRASE}
         </Text>
         <View style={{ flex: 10 }}>
-          {!todayCompletionLogs || todayCompletionLogs.length <= 0 ? (
-            <View>
-              <Text>No capsules found - please create one!</Text>
-              <Button
-                style={{ width: SCREEN_WIDTH * 0.45 }}
-                label="Create Capsule"
-                onPress={() => router.navigate("/create-capsule")}
-              />
-            </View>
-          ) : (
-            <HorizontalSwiper
-              style={styles.habitCardsScrollView}
-              pages={[
-                {
-                  key: "mascot",
-                  component: (
-                    <View
-                      style={{
-                        justifyContent: "center",
-                        width: SCREEN_WIDTH * 0.8,
-                        flexDirection: "row",
-                      }}
-                    >
-                      <Image
-                        source={require("../../../assets/images/mascot.gif")}
-                        style={styles.mascot}
-                      />
-                    </View>
-                  ),
-                },
-                {
-                  key: "todo-list",
-                  component: (
-                    <View>
+          <HorizontalSwiper
+            style={styles.habitCardsScrollView}
+            pages={[
+              {
+                key: "mascot",
+                component: (
+                  <View
+                    style={{
+                      justifyContent: "center",
+                      width: SCREEN_WIDTH * 0.8,
+                      flexDirection: "row",
+                    }}
+                  >
+                    <Image
+                      source={require("../../../assets/images/mascot.gif")}
+                      style={styles.mascot}
+                    />
+                  </View>
+                ),
+              },
+              {
+                key: "todo-list",
+                component: (
+                  <View>
+                    {!dailyCompletionLogs ||
+                    dailyCompletionLogs.length === 0 ? (
+                      <View>
+                        <Text>No capsules found - please create one!</Text>
+                        <Button
+                          style={{ width: SCREEN_WIDTH * 0.45 }}
+                          label="Create Capsule"
+                          onPress={() => router.navigate("/create-capsule")}
+                        />
+                      </View>
+                    ) : (
                       <FlatList
-                        data={todayCompletionLogs}
+                        data={stagingCompletionLogs}
                         style={{ height: HABIT_CARD_HEIGHT, borderRadius: 12 }}
                         contentContainerStyle={{ gap: GAP_BETWEEN_HABIT_CARDS }}
                         nestedScrollEnabled
@@ -90,18 +99,19 @@ export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
                           <HabitCard
                             key={listRenderItem.item.id}
                             completionLog={listRenderItem.item}
+                            onCompletion={toggleCompletion}
                           />
                         )}
                         keyExtractor={(completionLog: CompletionLogWithImage) =>
                           completionLog.id
-                        } // Provides a unique key for tracking elements
+                        }
                       />
-                    </View>
-                  ),
-                },
-              ]}
-            />
-          )}
+                    )}
+                  </View>
+                ),
+              },
+            ]}
+          />
         </View>
         <Button
           icon="happy-outline"

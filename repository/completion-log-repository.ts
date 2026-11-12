@@ -1,7 +1,6 @@
 import {
   CAPSULES_TABLE_NAME,
-  COMPLETION_LOG_PREFIX,
-  COMPLETION_LOGS_TABLE_NAME,
+  COMPLETION_LOGS_TABLE_NAME
 } from "@/constants/database";
 import { CompletionLog, CompletionLogWithImage } from "@/models/completion-log";
 import * as SQLite from "expo-sqlite";
@@ -114,9 +113,40 @@ export default class CompletionLogRepository implements ICompletionLogRepository
       );
     }
   }
-  async getLatestId(): Promise<string> {
-    const DEFAULT_ID = `${COMPLETION_LOG_PREFIX}_0001`;
 
+  async bulkComplete(completionLogs: CompletionLog[]): Promise<number> {
+    if (completionLogs.length === 0) return 0;
+
+    const idPlaceholders = completionLogs.map(() => "?").join(", ");
+    const casePlaceholders = completionLogs
+      .map(() => "WHEN id = ? THEN ?")
+      .join(" ");
+    const query = `
+      UPDATE ${COMPLETION_LOGS_TABLE_NAME}
+      SET completed = CASE ${casePlaceholders} END
+      WHERE id IN (${idPlaceholders});
+    `;
+
+    // Params follow placeholder order: CASE pairs first, then the IN list
+    const params = [
+      ...completionLogs.flatMap((log) => [log.id, log.completed ? 1 : 0]),
+      ...completionLogs.map((log) => log.id),
+    ];
+
+    console.log("[DAL] Executing SQL Query:", query);
+
+    try {
+      const result = await this.db.runAsync(query, params);
+      // changes is the number of rows updated
+      return result.changes;
+    } catch (e) {
+      console.error("Error bulk updating completion logs:", e);
+      throw new Error(
+        "Failed to bulk update completion logs due to a database error.",
+      );
+    }
+  }
+  async getLatestId(): Promise<string> {
     const query = `
       SELECT MAX(id) AS latestId
       FROM ${COMPLETION_LOGS_TABLE_NAME};
@@ -129,7 +159,7 @@ export default class CompletionLogRepository implements ICompletionLogRepository
       const row = await this.db.getFirstAsync<{ latestId: string | null }>(
         query,
       );
-      return row?.latestId ?? DEFAULT_ID;
+      return row?.latestId ?? "";
     } catch (e) {
       console.error("Error retrieving latest completion log id:", e);
       throw new Error(

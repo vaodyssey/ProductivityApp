@@ -6,15 +6,17 @@ import {
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
 import { CompletionLogWithImage } from "@/models/completion-log";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import { SCREEN_WIDTH } from "@gorhom/bottom-sheet";
 import React from "react";
 import { Image, StyleSheet, Text, TextStyle, View } from "react-native";
 
 interface HabitCardProps {
   completionLog: CompletionLogWithImage;
+  onCompletion: (completionLogId: string) => void;
 }
 
-const BackgroundOverlay = ({ completionLog }: HabitCardProps) => {
+const BackgroundOverlay = ({ completionLog, onCompletion }: HabitCardProps) => {
   const opacity = completionLog.opacity;
   const habitSubInfo: TextStyle = {
     color: opacity < 0.7 ? COLOR_WHITE : COLOR_BLACK_1, //TODO: Enhance image background color detection here
@@ -26,22 +28,33 @@ const BackgroundOverlay = ({ completionLog }: HabitCardProps) => {
         { backgroundColor: `rgba(0, 0, 0, ${1 - opacity})` },
       ]}
     >
-      <View style={styles.habitInfo}>
-        <Text style={[habitSubInfo, FONT_STYLES.H3_STYLE]}>
-          {completionLog.goodHabitName}
-        </Text>
-        <Text style={[habitSubInfo, FONT_STYLES.H5_STYLE]}>
-          {completionLog.dateTime}
-        </Text>
-      </View>
-      <Button icon="checkmark-circle-outline" label={"Complete"} />
+      {completionLog.completed ? (
+        <View style={styles.completeCheckMark}>
+          <Ionicons name="checkmark-circle-outline" size={100} color="white" />
+        </View>
+      ) : (
+        <View style={styles.habitInfo}>
+          <Text style={[habitSubInfo, FONT_STYLES.H3_STYLE]}>
+            {completionLog.goodHabitName}
+          </Text>
+          <Text style={[habitSubInfo, FONT_STYLES.H5_STYLE]}>
+            {completionLog.dateTime}
+          </Text>
+        </View>
+      )}
+      <Button
+        onPress={() => onCompletion(completionLog.id)}
+        icon="checkmark-circle-outline"
+        label={"Complete"}
+      />
     </View>
   );
 };
 
-const HabitCard: React.FC<HabitCardProps> = ({ completionLog }) => {
-  // Calculate opacity based on performance (assuming weeklyGoal is available)
-  // Opacity should be clamped between 0 and 1.
+const HabitCard: React.FC<HabitCardProps> = ({
+  completionLog,
+  onCompletion,
+}) => {
   return (
     <View style={styles.cardContainer}>
       <Image
@@ -51,7 +64,10 @@ const HabitCard: React.FC<HabitCardProps> = ({ completionLog }) => {
         }}
         style={styles.imageStyle}
       />
-      <BackgroundOverlay completionLog={completionLog} />
+      <BackgroundOverlay
+        completionLog={completionLog}
+        onCompletion={onCompletion}
+      />
     </View>
   );
 };
@@ -79,6 +95,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: "100%",
     height: "100%",
+  },
+  completeCheckMark: {
+    flex: 1,
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
   },
   habitInfo: {
     flex: 1,
