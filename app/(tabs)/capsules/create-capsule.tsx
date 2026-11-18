@@ -5,11 +5,12 @@ import { useLocalSearchParams } from "expo-router";
 import React from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
+
 import {
   CapsuleFormMode,
   DEFAULT_CAPSULE,
-} from "../../constants/per-screen/create-capsule/constants";
-import { useCapsule } from "../../hooks/per-screen/create-capsule/use-capsule";
+} from "@/constants/per-screen/create-capsule/constants";
+import { useCapsule } from "../../../hooks/per-screen/create-capsule/use-capsule";
 
 const CreateCapsuleScreen: React.FC = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();

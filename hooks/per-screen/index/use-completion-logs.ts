@@ -21,6 +21,8 @@ export const useCompletionLogs = ({
   const [weeklyCompletionLogs, setWeeklyCompletionLogs] =
     useState<CompletionLogWithImage[]>();
 
+  const [atLeastOneCapsuleExists, setAtLeastOneCapsuleExists] =
+    useState<boolean>(true);
   const calculateOpacityForCompletionLogs = (
     tempWeeklyCompletionLogs: CompletionLogWithImage[],
   ) => {
@@ -52,7 +54,10 @@ export const useCompletionLogs = ({
 
   const getCompletionLogs = async () => {
     const capsules = await capsuleRepository.getAll();
-    if (!capsules) return [];
+    if (!capsules) {
+      setAtLeastOneCapsuleExists(false);
+      return;
+    }
     const tempWeeklyCompletionLogs: CompletionLogWithImage[] = [];
 
     for (const capsule of capsules) {
@@ -82,5 +87,5 @@ export const useCompletionLogs = ({
     }, [pathName]),
   );
 
-  return { dailyCompletionLogs, weeklyCompletionLogs };
+  return { atLeastOneCapsuleExists, dailyCompletionLogs, weeklyCompletionLogs };
 };

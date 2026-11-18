@@ -2,27 +2,42 @@ import { Tabs } from "expo-router";
 import React from "react";
 
 import { HapticTab } from "@/components/haptic-tab";
-import { IconSymbol } from "@/components/ui/icon-symbol";
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { COLOR_GREY, COLOR_PRIMARY } from "@/constants/colors";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: COLOR_PRIMARY,
+        tabBarInactiveTintColor: COLOR_GREY,
         headerShown: false,
         tabBarButton: HapticTab,
       }}
     >
       <Tabs.Screen
+        name="index"
+        options={{
+          title: "Weekly Leaderboard",
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "bar-chart" : "bar-chart-outline"}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="capsules"
         options={{
           title: "Capsules",
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={28} name="paperplane.fill" color={color} />
+          tabBarIcon: ({ focused, color, size }) => (
+            <Ionicons
+              name={focused ? "cube" : "cube-outline"}
+              color={color}
+              size={size}
+            />
           ),
         }}
       />

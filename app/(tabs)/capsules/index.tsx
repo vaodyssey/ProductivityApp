@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { CardItem } from "@/components/per-screen/capsules/card-item";
 import Button, { ButtonVariants } from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "@/constants/dimensions";
@@ -9,7 +10,6 @@ import CapsuleRepository from "@/repository/capsule-repository";
 import { usePathname, useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React, { useEffect, useState } from "react";
-import { CardItem } from "../../components/per-screen/capsules/card-item";
 
 const CapsulesScreen = () => {
   const router = useRouter();
@@ -51,7 +51,7 @@ const CapsulesScreen = () => {
         label="Create"
         variant={ButtonVariants.PRIMARY}
         onPress={() => {
-          router.navigate("/create-capsule"); // Navigate back to the home screen
+          router.navigate("/(tabs)/capsules/create-capsule"); // Navigate back to the home screen
         }}
       />
     </View>

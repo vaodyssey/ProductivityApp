@@ -7,7 +7,6 @@
 // import React, { useState } from "react";
 // import { StyleSheet, View } from "react-native";
 
-import { MyTopHabits } from "@/components/per-screen/index/my-top-habits";
 import { ProgressBuddy } from "@/components/per-screen/index/progress-buddy";
 import { SCREEN_HEIGHT } from "@gorhom/bottom-sheet";
 import React, { useRef } from "react";
@@ -65,7 +64,6 @@ const IndexScreen = () => {
       nestedScrollEnabled={false}
     >
       <ProgressBuddy scrollViewRef={scrollViewRef} />
-      <MyTopHabits scrollViewRef={scrollViewRef} />
     </ScrollView>
   );
 

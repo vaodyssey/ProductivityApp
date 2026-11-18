@@ -18,10 +18,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";
 
-export const unstable_settings = {
-  anchor: "(tabs)",
-};
-
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const styles = StyleSheet.create({
@@ -45,16 +41,9 @@ export default function RootLayout() {
                 databaseName={DATABASE_NAME}
                 onInit={initDatabaseIfApplicable}
               >
-                <Stack>
-                  <Stack.Screen name="index" options={{ headerShown: false }} />
-                  <Stack.Screen
-                    name="(tabs)"
-                    options={{ headerShown: false }}
-                  />
-                  <Stack.Screen
-                    name="create-capsule/index"
-                    options={{ title: "Create Capsule" }}
-                  />
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="index" />
+                  <Stack.Screen name="(tabs)" />
                 </Stack>
               </SQLiteProvider>
               <StatusBar style="auto" />

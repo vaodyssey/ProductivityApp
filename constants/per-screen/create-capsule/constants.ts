@@ -1,10 +1,10 @@
 import { Capsule } from "@/models/capsule";
 
 export const DEFAULT_CAPSULE: Capsule = {
-  id: undefined,
-  badHabitName: "",
-  appPackageName: "",
-  imageUrl: "",
+  id: "CS_0001",
+  goodHabitName: "",
+  badAppPackageName: "",
+  goodImageUrl: "",
 };
 
 export enum CapsuleFormMode {

@@ -21,7 +21,8 @@ import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React from "react";
 import { FlatList, Image, StyleSheet, Text, View } from "react-native";
-import HabitCard from "./HabitCard";
+import { CreateCapsuleNav } from "./create-capsule-nav";
+import HabitCard from "./habit-card";
 
 export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
   // const { isLoading, moodStatus } = useMascotMood();
@@ -30,10 +31,11 @@ export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
   const completionLogRepository = new CompletionLogRepository(db);
   const capsuleRepository = new CapsuleRepository(db);
 
-  const { dailyCompletionLogs, weeklyCompletionLogs } = useCompletionLogs({
-    capsuleRepository,
-    completionLogRepository,
-  });
+  const { atLeastOneCapsuleExists, dailyCompletionLogs, weeklyCompletionLogs } =
+    useCompletionLogs({
+      capsuleRepository,
+      completionLogRepository,
+    });
 
   const { stagingCompletionLogs, toggleCompletion } = useCompleteCompletionLogs(
     {
@@ -52,83 +54,94 @@ export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
           {PROGRESS_BUDDY_PHRASE}
         </Text>
         <View style={{ flex: 10 }}>
-          <HorizontalSwiper
-            style={styles.habitCardsScrollView}
-            pages={[
-              {
-                key: "mascot",
-                component: (
-                  <View
-                    style={{
-                      justifyContent: "center",
-                      width: SCREEN_WIDTH * 0.8,
-                      flexDirection: "row",
-                    }}
-                  >
-                    <Image
-                      source={require("../../../assets/images/mascot.gif")}
-                      style={styles.mascot}
-                    />
-                  </View>
-                ),
-              },
-              {
-                key: "todo-list",
-                component: (
-                  <View>
-                    {!dailyCompletionLogs ||
-                    dailyCompletionLogs.length === 0 ? (
-                      <View>
-                        <Text>No capsules found - please create one!</Text>
-                        <Button
-                          style={{ width: SCREEN_WIDTH * 0.45 }}
-                          label="Create Capsule"
-                          onPress={() => router.navigate("/create-capsule")}
-                        />
-                      </View>
-                    ) : (
-                      <FlatList
-                        data={stagingCompletionLogs}
-                        style={{ height: HABIT_CARD_HEIGHT, borderRadius: 12 }}
-                        contentContainerStyle={{ gap: GAP_BETWEEN_HABIT_CARDS }}
-                        nestedScrollEnabled
-                        snapToInterval={FLATLIST_SNAP_INTERVAL} // Distance between snapping stops
-                        snapToAlignment="center" // Aligns snapped item to "start", "center", or "end"
-                        decelerationRate="fast"
-                        renderItem={(listRenderItem) => (
-                          <HabitCard
-                            key={listRenderItem.item.id}
-                            completionLog={listRenderItem.item}
-                            onCompletion={toggleCompletion}
-                          />
-                        )}
-                        keyExtractor={(completionLog: CompletionLogWithImage) =>
-                          completionLog.id
-                        }
-                      />
-                    )}
-                  </View>
-                ),
-              },
-            ]}
-          />
+          {!atLeastOneCapsuleExists ? (
+            <CreateCapsuleNav atLeastOneCapsuleExists={false} />
+          ) : (
+            <TaskList
+              atLeastOneCapsuleExists={atLeastOneCapsuleExists}
+              dailyCompletionLogs={dailyCompletionLogs}
+              stagingCompletionLogs={stagingCompletionLogs}
+              toggleCompletion={toggleCompletion}
+            />
+          )}
         </View>
         <Button
           icon="happy-outline"
           style={{ width: SCREEN_WIDTH * 0.45 }}
-          label="Weekly Highlights"
-          onPress={() => {
-            scrollViewRef?.current?.scrollTo({
-              y: SCREEN_HEIGHT,
-              animated: true,
-            });
-          }}
+          label="Click here for more!"
+          onPress={() => router.push("/(tabs)")}
         />
       </View>
     </LinearGradientBackground>
   );
 };
 
+interface TaskListProps {
+  dailyCompletionLogs: CompletionLogWithImage[];
+  atLeastOneCapsuleExists: boolean;
+  stagingCompletionLogs: CompletionLogWithImage[];
+  toggleCompletion: (completionLogId: string) => void;
+}
+const TaskList = ({
+  dailyCompletionLogs,
+  stagingCompletionLogs,
+  toggleCompletion,
+}: TaskListProps) => {
+  return (
+    <HorizontalSwiper
+      style={styles.habitCardsScrollView}
+      pages={[
+        {
+          key: "mascot",
+          component: (
+            <View
+              style={{
+                justifyContent: "center",
+                width: SCREEN_WIDTH * 0.8,
+                flexDirection: "row",
+              }}
+            >
+              <Image
+                source={require("../../../assets/images/mascot.gif")}
+                style={styles.mascot}
+              />
+            </View>
+          ),
+        },
+        {
+          key: "todo-list",
+          component: (
+            <View>
+              {!dailyCompletionLogs || dailyCompletionLogs.length === 0 ? (
+                <CreateCapsuleNav atLeastOneCapsuleExists />
+              ) : (
+                <FlatList
+                  data={stagingCompletionLogs}
+                  style={{ height: HABIT_CARD_HEIGHT, borderRadius: 12 }}
+                  contentContainerStyle={{ gap: GAP_BETWEEN_HABIT_CARDS }}
+                  nestedScrollEnabled
+                  snapToInterval={FLATLIST_SNAP_INTERVAL} // Distance between snapping stops
+                  snapToAlignment="center" // Aligns snapped item to "start", "center", or "end"
+                  decelerationRate="fast"
+                  renderItem={(listRenderItem) => (
+                    <HabitCard
+                      key={listRenderItem.item.id}
+                      completionLog={listRenderItem.item}
+                      onCompletion={toggleCompletion}
+                    />
+                  )}
+                  keyExtractor={(completionLog: CompletionLogWithImage) =>
+                    completionLog.id
+                  }
+                />
+              )}
+            </View>
+          ),
+        },
+      ]}
+    />
+  );
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,

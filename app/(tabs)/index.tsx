@@ -1,4 +1,3 @@
-import Button from "@/components/ui/button";
 
 import {
   COLOR_BRONZE,
@@ -14,7 +13,6 @@ import {
 } from "@/constants/per-screen/index/constants";
 import FONT_STYLES from "@/constants/text";
 import { Capsule } from "@/models/capsule";
-import { ToggleScrollViewProps } from "@/types/toggle-scroll-view-props";
 import React from "react";
 import { ColorValue, Image, StyleSheet, Text, View } from "react-native";
 
@@ -71,7 +69,7 @@ const RemainingHabitItem = ({ capsule }: { capsule: Capsule }) => {
     <View style={styles.remainingItem}>
       <View style={styles.avatarCircle}>
         <Image
-          source={require("../../../assets/images/favicon.png")}
+          source={require("../../assets/images/favicon.png")}
           style={styles.avatarImage}
         />
       </View>
@@ -88,8 +86,8 @@ const RemainingHabitItem = ({ capsule }: { capsule: Capsule }) => {
   );
 };
 
-export const MyTopHabits = ({ scrollViewRef }: ToggleScrollViewProps) => {
-  const sorted = sortCapsules(MOCK_CAPSULES);
+const MyTopHabits = () => {
+  const sorted = MOCK_CAPSULES;
   const top3 = sorted.slice(0, TOP_HABITS_COUNT);
   const remaining = sorted.slice(TOP_HABITS_COUNT, TOP_HABITS_COUNT + 2);
 
@@ -108,14 +106,6 @@ export const MyTopHabits = ({ scrollViewRef }: ToggleScrollViewProps) => {
           <RemainingHabitItem key={capsule.id} capsule={capsule} />
         ))}
       </View>
-      <Button
-        label="Home"
-        icon="home-outline"
-        style={{ width: SCREEN_WIDTH * 0.3 }}
-        onPress={() =>
-          scrollViewRef?.current?.scrollTo({ y: 0, animated: true })
-        }
-      />
     </View>
   );
 };
@@ -197,4 +187,10 @@ const styles = StyleSheet.create({
   remainingCount: {
     color: COLOR_GREY,
   },
+  navButtons: {
+    flexDirection: "row",
+    gap: SCREEN_WIDTH * 0.06,
+  },
 });
+
+export default MyTopHabits;

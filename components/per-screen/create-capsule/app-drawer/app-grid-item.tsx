@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import myImage from "../../../../assets/images/favicon.png";
 import { AppItem } from "./types";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -34,7 +33,10 @@ export const AppGridItem: React.FC<AppGridItemProps> = ({
 
       {/* Column 2 - App icon (1/12 width) */}
       <View style={styles.iconColumn}>
-        <Image source={myImage} style={styles.icon} />
+        <Image
+          source={"../../../../assets/images/favicon.png"}
+          style={styles.icon}
+        />
       </View>
     </TouchableOpacity>
   );
