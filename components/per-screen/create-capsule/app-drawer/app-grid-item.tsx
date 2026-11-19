@@ -34,7 +34,7 @@ export const AppGridItem: React.FC<AppGridItemProps> = ({
       {/* Column 2 - App icon (1/12 width) */}
       <View style={styles.iconColumn}>
         <Image
-          source={"../../../../assets/images/favicon.png"}
+          source={require("@/assets/images/favicon.png")}
           style={styles.icon}
         />
       </View>

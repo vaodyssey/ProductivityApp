@@ -4,7 +4,6 @@ export default function CapsulesLayout() {
   return (
     <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
-      <Stack.Screen name="create-capsule" options={{ headerShown: false }} />
     </Stack>
   );
 }

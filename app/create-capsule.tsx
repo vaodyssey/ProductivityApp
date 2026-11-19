@@ -10,14 +10,15 @@ import {
   CapsuleFormMode,
   DEFAULT_CAPSULE,
 } from "@/constants/per-screen/create-capsule/constants";
-import { useCapsule } from "../../../hooks/per-screen/create-capsule/use-capsule";
+import { useCapsule } from "@/hooks/per-screen/create-capsule/use-capsule";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CreateCapsuleScreen: React.FC = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const methods = useForm<Capsule>({ defaultValues: DEFAULT_CAPSULE });
   const mode = id ? CapsuleFormMode.EDIT : CapsuleFormMode.CREATE;
   const shouldChangeScreenTitle = !!id;
-
+  const insets = useSafeAreaInsets();
   useCapsule({ methods, id });
   useChangeScreenTitle({
     newTitle: "Update Capsule",
@@ -26,7 +27,13 @@ const CreateCapsuleScreen: React.FC = () => {
 
   return (
     <FormProvider {...methods}>
-      <View style={styles.container}>
+      <View
+        style={{
+          ...styles.container,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        }}
+      >
         <CapsuleForm mode={mode} />
       </View>
     </FormProvider>

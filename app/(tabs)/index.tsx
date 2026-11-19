@@ -1,4 +1,3 @@
-
 import {
   COLOR_BRONZE,
   COLOR_GOLD,
@@ -69,7 +68,7 @@ const RemainingHabitItem = ({ capsule }: { capsule: Capsule }) => {
     <View style={styles.remainingItem}>
       <View style={styles.avatarCircle}>
         <Image
-          source={require("../../assets/images/favicon.png")}
+          source={require("@assets/images/favicon.png")}
           style={styles.avatarImage}
         />
       </View>

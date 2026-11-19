@@ -1,10 +1,9 @@
-import { HOME_ROUTE } from "@/constants/routes";
 import { CompletionLogWithImage } from "@/models/completion-log";
 import CapsuleRepository from "@/repository/capsule-repository";
 import CompletionLogRepository from "@/repository/completion-log-repository";
 import { getWeekRange, toDateString } from "@/utils/date";
 import { useFocusEffect, usePathname } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 interface UseCompletionLogsProps {
   completionLogRepository: CompletionLogRepository;
@@ -18,21 +17,25 @@ export const useCompletionLogs = ({
   const [dailyCompletionLogs, setDailyCompletionLogs] = useState<
     CompletionLogWithImage[]
   >([]);
-  const [weeklyCompletionLogs, setWeeklyCompletionLogs] =
-    useState<CompletionLogWithImage[]>();
+  const [averageCompletionRate, setAverageCompletionRate] = useState<number>(0);
 
   const [atLeastOneCapsuleExists, setAtLeastOneCapsuleExists] =
-    useState<boolean>(true);
-  const calculateOpacityForCompletionLogs = (
+    useState<boolean>(false);
+
+  const calculateCompletionRate = (
     tempWeeklyCompletionLogs: CompletionLogWithImage[],
   ) => {
     const completedCount = tempWeeklyCompletionLogs.reduce((count, log) => {
       return log.completed ? count + 1 : count;
     }, 0);
-    return tempWeeklyCompletionLogs.map((wcl) => ({
-      ...wcl,
-      opacity: completedCount / tempWeeklyCompletionLogs.length,
-    }));
+    const completionRate = completedCount / tempWeeklyCompletionLogs.length;
+    return {
+      completionRatePerCapsule: completionRate,
+      weeklyCompletionRatePerCapsule: tempWeeklyCompletionLogs.map((wcl) => ({
+        ...wcl,
+        completionRate: completionRate,
+      })),
+    };
   };
   const getDailyCompletionLogs = (
     tempWeeklyCompletionLogs: CompletionLogWithImage[],
@@ -49,43 +52,43 @@ export const useCompletionLogs = ({
       toDateString(startOfWeek),
       toDateString(endOfWeek),
     );
-    return calculateOpacityForCompletionLogs(weeklyCompletionLogs);
+    return calculateCompletionRate(weeklyCompletionLogs);
   };
 
   const getCompletionLogs = async () => {
     const capsules = await capsuleRepository.getAll();
-    if (!capsules) {
-      setAtLeastOneCapsuleExists(false);
-      return;
-    }
+    if (!capsules || (capsules && capsules.length === 0)) return;
     const tempWeeklyCompletionLogs: CompletionLogWithImage[] = [];
+    let totalCompletionRate = 0;
 
     for (const capsule of capsules) {
-      const completionLogsPerCapsule = await getWeeklyCompletionLogs(
-        capsule.id,
-      );
-
-      tempWeeklyCompletionLogs.push(...completionLogsPerCapsule);
+      const { completionRatePerCapsule, weeklyCompletionRatePerCapsule } =
+        await getWeeklyCompletionLogs(capsule.id);
+      totalCompletionRate += completionRatePerCapsule;
+      tempWeeklyCompletionLogs.push(...weeklyCompletionRatePerCapsule);
     }
     const tempDailyCompletionLogs = getDailyCompletionLogs(
       tempWeeklyCompletionLogs,
     );
-
+    setAverageCompletionRate(totalCompletionRate / capsules.length);
     setDailyCompletionLogs(tempDailyCompletionLogs);
-    setWeeklyCompletionLogs(tempWeeklyCompletionLogs);
+    setAtLeastOneCapsuleExists(true);
   };
-  useEffect(() => {
-    console.log("this app is shiett: ", dailyCompletionLogs);
-    console.log("this app is facking bullshiet: ", weeklyCompletionLogs);
-  }, [dailyCompletionLogs, weeklyCompletionLogs]);
 
   useFocusEffect(
     useCallback(() => {
-      console.log("ROUTENAMEEE: ", pathName);
-      if (pathName !== HOME_ROUTE) return;
       getCompletionLogs();
-    }, [pathName]),
+    }, []),
   );
+  // useEffect(() => {
+  //   console.log("ROUTENAMEEE: ", pathName);
+  //   if (pathName !== HOME_ROUTE) return;
+  //   getCompletionLogs();
+  // }, [pathName]);
 
-  return { atLeastOneCapsuleExists, dailyCompletionLogs, weeklyCompletionLogs };
+  return {
+    atLeastOneCapsuleExists,
+    dailyCompletionLogs,
+    averageCompletionRate,
+  };
 };

@@ -17,15 +17,15 @@ interface HabitCardProps {
 }
 
 const BackgroundOverlay = ({ completionLog, onCompletion }: HabitCardProps) => {
-  const opacity = completionLog.opacity;
+  const completionRate = completionLog.completionRate;
   const habitSubInfo: TextStyle = {
-    color: opacity < 0.7 ? COLOR_WHITE : COLOR_BLACK_1, //TODO: Enhance image background color detection here
+    color: completionRate < 0.7 ? COLOR_WHITE : COLOR_BLACK_1, //TODO: Enhance image background color detection here
   };
   return (
     <View
       style={[
         styles.backgroundOverlay,
-        { backgroundColor: `rgba(0, 0, 0, ${1 - opacity})` },
+        { backgroundColor: `rgba(0, 0, 0, ${1 - completionRate})` },
       ]}
     >
       {completionLog.completed ? (
@@ -59,8 +59,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
     <View style={styles.cardContainer}>
       <Image
         source={{
-          uri:
-            completionLog.goodImageUrl ?? "../../../assets/images/mascot.png",
+          uri: completionLog.goodImageUrl ?? "@/assets/images/mascot.png",
         }}
         style={styles.imageStyle}
       />

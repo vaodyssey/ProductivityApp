@@ -12,7 +12,7 @@ export const CreateCapsuleNav = ({
 }: CreateCapsuleNavProps) => {
   const message = atLeastOneCapsuleExists
     ? "You've completed all of today's task! Want to grow more?"
-    : "No capsules found - please create one!";
+    : "Welcome! Let's get started!";
   return (
     <View style={styles.container}>
       <Text style={{ ...FONT_STYLES.H3_STYLE, textAlign: "center" }}>
@@ -22,7 +22,7 @@ export const CreateCapsuleNav = ({
         icon="add-circle-outline"
         style={{ width: SCREEN_WIDTH * 0.45 }}
         label="Create Capsule"
-        onPress={() => router.navigate("/(tabs)/capsules/create-capsule")}
+        onPress={() => router.navigate("/create-capsule")}
       />
     </View>
   );
@@ -30,7 +30,6 @@ export const CreateCapsuleNav = ({
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     flexDirection: "column",
     alignItems: "center",
     width: "100%",

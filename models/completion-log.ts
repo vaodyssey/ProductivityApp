@@ -11,5 +11,5 @@ export interface CompletionLogWithImage {
   completed: number | boolean;
   goodHabitName: string;
   goodImageUrl: string;
-  opacity: number;
+  completionRate: number;
 }

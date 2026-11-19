@@ -20,22 +20,26 @@ import { ToggleScrollViewProps } from "@/types/toggle-scroll-view-props";
 import { useRouter } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import React from "react";
-import { FlatList, Image, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CreateCapsuleNav } from "./create-capsule-nav";
 import HabitCard from "./habit-card";
+import { MascotDisplay } from "./mascot-display";
 
 export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
-  // const { isLoading, moodStatus } = useMascotMood();
   const router = useRouter();
   const db = useSQLiteContext();
   const completionLogRepository = new CompletionLogRepository(db);
   const capsuleRepository = new CapsuleRepository(db);
 
-  const { atLeastOneCapsuleExists, dailyCompletionLogs, weeklyCompletionLogs } =
-    useCompletionLogs({
-      capsuleRepository,
-      completionLogRepository,
-    });
+  const {
+    atLeastOneCapsuleExists,
+    dailyCompletionLogs,
+    averageCompletionRate,
+  } = useCompletionLogs({
+    capsuleRepository,
+    completionLogRepository,
+  });
 
   const { stagingCompletionLogs, toggleCompletion } = useCompleteCompletionLogs(
     {
@@ -43,48 +47,68 @@ export const ProgressBuddy = ({ scrollViewRef }: ToggleScrollViewProps) => {
       dailyCompletionLogs,
     },
   );
+
+  const insets = useSafeAreaInsets();
+  const insetsViewStyle: ViewStyle = {
+    paddingTop: insets.top + SCREEN_HEIGHT * 0.05,
+    paddingBottom: insets.bottom + SCREEN_HEIGHT * 0.05,
+  };
   return (
     <LinearGradientBackground
       colors={LINEAR_GRADIENT_2}
       start={{ x: 0.6, y: 0.3 }}
       end={{ x: 1, y: 1 }}
     >
-      <View style={{ ...styles.container }}>
-        <Text style={[styles.phrase, FONT_STYLES.H1_STYLE]}>
-          {PROGRESS_BUDDY_PHRASE}
-        </Text>
-        <View style={{ flex: 10 }}>
-          {!atLeastOneCapsuleExists ? (
-            <CreateCapsuleNav atLeastOneCapsuleExists={false} />
-          ) : (
+      {!atLeastOneCapsuleExists ? (
+        <View
+          style={{
+            ...styles.sharedContainer,
+            ...styles.noCapsuleContainer,
+            ...insetsViewStyle,
+          }}
+        >
+          <CreateCapsuleNav atLeastOneCapsuleExists={false} />
+        </View>
+      ) : (
+        <View
+          style={{
+            ...styles.sharedContainer,
+            ...styles.container,
+            ...insetsViewStyle,
+          }}
+        >
+          <Text style={[styles.phrase, FONT_STYLES.H1_STYLE]}>
+            {PROGRESS_BUDDY_PHRASE}
+          </Text>
+
+          <View style={{ flex: 10 }}>
             <TaskList
-              atLeastOneCapsuleExists={atLeastOneCapsuleExists}
-              dailyCompletionLogs={dailyCompletionLogs}
               stagingCompletionLogs={stagingCompletionLogs}
               toggleCompletion={toggleCompletion}
+              averageCompletionRate={averageCompletionRate}
             />
-          )}
+          </View>
+
+          <Button
+            icon="happy-outline"
+            style={{ width: SCREEN_WIDTH * 0.45 }}
+            label="Click here for more!"
+            onPress={() => router.push("/(tabs)")}
+          />
         </View>
-        <Button
-          icon="happy-outline"
-          style={{ width: SCREEN_WIDTH * 0.45 }}
-          label="Click here for more!"
-          onPress={() => router.push("/(tabs)")}
-        />
-      </View>
+      )}
     </LinearGradientBackground>
   );
 };
 
 interface TaskListProps {
-  dailyCompletionLogs: CompletionLogWithImage[];
-  atLeastOneCapsuleExists: boolean;
   stagingCompletionLogs: CompletionLogWithImage[];
+  averageCompletionRate: number;
   toggleCompletion: (completionLogId: string) => void;
 }
 const TaskList = ({
-  dailyCompletionLogs,
   stagingCompletionLogs,
+  averageCompletionRate,
   toggleCompletion,
 }: TaskListProps) => {
   return (
@@ -94,26 +118,15 @@ const TaskList = ({
         {
           key: "mascot",
           component: (
-            <View
-              style={{
-                justifyContent: "center",
-                width: SCREEN_WIDTH * 0.8,
-                flexDirection: "row",
-              }}
-            >
-              <Image
-                source={require("../../../assets/images/mascot.gif")}
-                style={styles.mascot}
-              />
-            </View>
+            <MascotDisplay averageCompletionRate={averageCompletionRate} />
           ),
         },
         {
           key: "todo-list",
           component: (
             <View>
-              {!dailyCompletionLogs || dailyCompletionLogs.length === 0 ? (
-                <CreateCapsuleNav atLeastOneCapsuleExists />
+              {!stagingCompletionLogs || stagingCompletionLogs.length === 0 ? (
+                <CreateCapsuleNav atLeastOneCapsuleExists={true} />
               ) : (
                 <FlatList
                   data={stagingCompletionLogs}
@@ -143,20 +156,19 @@ const TaskList = ({
   );
 };
 const styles = StyleSheet.create({
-  container: {
+  sharedContainer: {
     flex: 1,
-    justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: SCREEN_HEIGHT * 0.15,
 
     flexDirection: "column",
-    // width: SCREEN_WIDTH,
+
     height: SCREEN_HEIGHT,
-    // justifyContent: "center",
-    // alignItems: "center",
-    // paddingHorizontal: SCREEN_WIDTH * 0.06,
-    // paddingVertical: SCREEN_HEIGHT * 0.2,
-    // gap: SCREEN_HEIGHT * 0.08,
+  },
+  noCapsuleContainer: {
+    justifyContent: "center",
+  },
+  container: {
+    justifyContent: "space-between",
   },
   phrase: {
     color: COLOR_PRIMARY,
@@ -166,14 +178,8 @@ const styles = StyleSheet.create({
 
   habitCardsScrollView: {
     width: SCREEN_WIDTH * 0.8,
-    // flex: 1,
   },
 
-  mascot: {
-    // width: SCREEN_WIDTH * 0.6,
-    // resizeMode: "contain",
-    justifyContent: "center",
-  },
   hint: {
     color: COLOR_PRIMARY,
     opacity: 0.6,

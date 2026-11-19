@@ -22,7 +22,7 @@ export const CardItem: React.FC<CardItemProps> = ({
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const updateCapsule = (id: string | undefined) => {
     router.navigate({
-      pathname: "/(tabs)/capsules/create-capsule",
+      pathname: "/create-capsule",
       params: { id },
     });
   };

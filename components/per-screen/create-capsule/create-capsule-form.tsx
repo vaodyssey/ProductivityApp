@@ -35,7 +35,7 @@ const CapsuleForm: React.FC<CapsuleFormProps> = ({ mode }) => {
       console.log("seected days: ", selectedDays);
       setIsSubmitting(true);
       const capsule = getValues();
-      createCapsule({
+      await createCapsule({
         capsuleRepository,
         completionLogRepository,
         capsule,
